@@ -1,0 +1,15 @@
+-----
+title: About
+-----
+
+Hi! I'm *Mario Román*. I study Mathematics and Computer science in
+Granada. I also write in [[http://tux.ugr.es/dgiim/][LibreIM]].
+
+  - GitHub: [[https://github.com/M42][@M42]].
+  - CV: [[https://m42.github.io/friggeri-cv-a4/cv.pdf][My CV on Github pages]].
+  - Email: [[mailto:mromang08+blog@gmail.com][mromang08+blog@gmail.com]]
+
+All the articles in this page are licensed in [[https://creativecommons.org/licenses/by-sa/2.0/][Creative Commons BY-SA 2.0]]
+unless otherwise specified.
+
+This blog is powered by Hakyll and GNU Emacs.
