@@ -1,0 +1,11 @@
+---
+title: Mikrokosmos 0.3.0
+---
+
+Mikrokosmos version 0.3.0 is out! This version comes bundled with a Jupyter
+Notebook kernel, a tutorial on lambda calculus and specific modes for SKI
+combinators.
+
+ * [[https://github.com/m42/mikrokosmos][GitHub repository]].
+ * [[https://m42.github.io/mikrokosmos/][User's guide]].
+ * [[https://github.com/M42/jupyter-mikrokosmos][Jupyter kernel]].

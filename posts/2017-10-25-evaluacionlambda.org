@@ -1,0 +1,73 @@
+---
+title: Evaluación en el cálculo lambda
+---
+
+Un repaso de los enunciados que nos llevan a usar la evaluación
+mediante \beta-reducciones del cálculo \lambda como un lenguaje
+de programación.
+
+Detallo todo esto con demostraciones en [[https://github.com/M42/lambda.notes][M42/lambda.notes]].
+
+** Forma normal
+Una expresión está en *forma normal* si no se le pueden aplicar más
+\beta-reducciones. La forma normal es /única/ como consecuencia del
+teorema de Church-Rosser.
+
+#+attr_latex: :options {Church-Rosser}
+#+begin_exampleblock
+Si a un término se le aplican distintas reducciones, los términos
+que se obtienen pueden reducirse a uno común. Es decir,
+
+ * si $A$ puede reducirse mediante \beta-reducciones a otro término
+   $B$, lo que se nota por $A \twoheadrightarrow_{\beta} B$,
+ * y $A$ puede reducirse también mediante otras \beta-reducciones,
+   posiblemente distintas o en distinto orden, a $C$, $A \twoheadrightarrow_{\beta} C$,
+ * entonces existe un término $D$ tal que ambos se pueden reducir
+   mediante \beta-reducciones a él; es decir, tal que $B \twoheadrightarrow_{\beta} D$
+   y $C \twoheadrightarrow_{\beta} D$.
+#+end_exampleblock
+
+En particular, esto implica que si un término tuviera dos formas
+normales, debería existir otro término al cual se pudieran reducir
+ambas; como son formas normales y no pueden reducirse, esto debe
+implicar que son iguales.
+
+** Divergencia
+Hemos visto que la forma normal es única, pero no que exista o que
+sepamos encontrarla de alguna forma.
+
+Puede ocurrir que un término no esté en forma normal y sin embargo
+las reducciones no lo lleven a ella. Por ejemplo,
+\[
+\Omega = (\lambda x.x\ x)(\lambda x.x\ x) \longrightarrow_{\beta} (\lambda x.x\ x)(\lambda x.x\ x)
+\]
+*no llega a forma normal*. O por ejemplo,
+\[
+(\lambda x.x\ x\ x)(\lambda x.x\ x\ x)
+\]
+se hace más complejo al aplicarle reducciones y *diverge*.
+
+** Evaluación a izquierda
+Hay expresiones que llegarán a una forma normal o no dependiendo de
+cómo los evaluemos. Por ejemplo,
+
+ * $\mathtt{const}\ \mathtt{id}\ \Omega \quad\longrightarrow_{\beta}\quad \mathtt{id}$,
+   llega a forma normal si evaluamos primero $\mathtt{const}$;
+
+ * $\mathtt{const}\ \mathtt{id}\ \Omega \quad\longrightarrow_{\beta}\quad \mathtt{const}\ \mathtt{id}\ \Omega$,
+   no llega a forma normal nunca si empezamos evaluando primero $\Omega$.
+
+Sin embargo, existe una estrategia de reducción que siempre encuentra
+una forma normal si esta existe.
+
+: Si existe una forma normal, la estrategia que reduce a cada paso
+: la aplicación más a la izquierda posible la encuentra.
+
+Y quizá sorprendentemente, existe otra estrategia de reducción que siempre
+encuentra la forma de no llegar a la forma normal si esta existe
+
+: Si existe alguna sucesión que no llega a forma normal, la estrategia que reduce a cada paso
+: la aplicación más a la derecha posible la encuentra.
+
+Estas dos formas de evaluación se suelen llamar *call-by-value* y
+*call-by-name*.
