@@ -52,3 +52,17 @@ postCtx :: Context String
 postCtx =
     dateField "date" "%B %e, %Y" `mappend`
     defaultContext
+
+--------------------------------------------------------------------------------
+-- Mathjax.
+-- http://travis.athougies.net/posts/2013-08-13-using-math-on-your-hakyll-blog.html
+pandocMathCompiler =
+    let mathExtensions = [Ext_tex_math_dollars, Ext_tex_math_double_backslash,
+                          Ext_latex_macros]
+        defaultExtensions = writerExtensions defaultHakyllWriterOptions
+        newExtensions = foldr S.insert defaultExtensions mathExtensions
+        writerOptions = defaultHakyllWriterOptions {
+                          writerExtensions = newExtensions,
+                          writerHTMLMathMethod = MathJax ""
+                        }
+    in pandocCompilerWith defaultHakyllReaderOptions writerOptions
