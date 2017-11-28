@@ -3,12 +3,12 @@ title: Lema de Yoneda
 ---
 
 ** Lema de Yoneda
-Sea $G : {\cal C} \longrightarrow \mathtt{Set}$ un funtor covariante. Fijado $A \in obj({\cal C})$, tenemos una
-biyección entre las transformaciones naturales del funtor $Hom(A,-)$ a
+Sea $G : {\cal C} \longrightarrow \mathtt{Set}$ un funtor covariante. Fijado $A \in \mathrm{obj}({\cal C})$, tenemos una
+biyección entre las transformaciones naturales del funtor $\mathrm{Hom}(A,-)$ a
 $G$ y los elementos del conjunto $G(A)$:
 
 \[
-y : Nat(Hom_{\cal C}(A,-),G) \longrightarrow G(A)
+y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(A,-),G) \longrightarrow G(A)
 \]
 
 Que viene dada por $y(\tau) = \tau_A(1_A)$, la imagen de la identidad por la
@@ -19,8 +19,11 @@ Dado cualquier $p$ crearemos la única transformación natural que cumple
 $\eta_A(1_A) = p$. Por definición de transformación natural, sabemos que debe
 cumplir el siguiente diagrama conmutativo:
 
-#+attr_html: :width 500px
-https://raw.githubusercontent.com/M42/m42.github.io/images/yonedaproof1.jpeg
+\[\require{AMScd}\begin{CD}
+\mathrm{Hom}(A,A)     @>{f \circ \_}>>  \mathrm{Hom}(A,B)\\
+@VV{\eta_{A}}V        @VV{\eta_B}V\\
+GA     @>{Gf}>>  GB
+\end{CD}\]
 
 Lo que deja determinado a cualquier $\eta_B(f)$, y por tanto a toda la función:
 
@@ -30,10 +33,14 @@ Nos falta comprobar que la función así construida es de hecho una
 transformación natural. Es decir, que cumple el siguiente diagrama
 conmutativo:
 
-#+attr_html: :width 500px
-https://raw.githubusercontent.com/M42/m42.github.io/images/yonedaproof2.jpeg
+\[\require{AMScd}\begin{CD}
+\mathrm{Hom}(A,B)     @>{g \circ \_}>>  \mathrm{Hom}(A,C)\\
+@VV{\eta_B}V        @VV{\eta_C}V\\
+GB     @>{Gg}>>  GC
+\end{CD}\]
 
-Y de hecho, dado cualquier elemento $f \in Hom(A,B)$ tenemos:
+
+Y de hecho, dado cualquier elemento $f \in \mathrm{Hom}(A,B)$ tenemos:
 
 \[Gg\circ \eta(f) = Gg \circ Gf(p) = G(g\circ f)(p) = \eta(g\circ f)\]
 
@@ -43,7 +50,7 @@ y fijado $A \in obj({\cal C})$; existe una biyección entre las transformaciones
 del funtor $Hom(-,A)$ a $G$ y los elementos del conjunto $G(A)$:
 
 \[
-y : Nat(Hom_{\cal C}(-,A),G) \longrightarrow G(A)
+y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(-,A),G) \longrightarrow G(A)
 \]
 
 Que viene de nuevo dada por $y(\tau) = \tau_A(1_A)$.
