@@ -4,6 +4,9 @@ body {
     font-size: 17px;
     margin: 0px auto 0px auto;
     width: 600px;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
 }
 
 div#header {
@@ -65,3 +68,16 @@ code {
     margin: 10px 10px;
     font-style: italic;
 }
+
+.proof {
+    margin: 10px 10px;
+}
+
+/* .proof:after { */
+/*     content: '∎'; */
+/*     display: block; */
+/*     /\* font-size: 100%; *\/ */
+/*     /\* bottom: 0%; *\/ */
+/*     /\* right: 0%; *\/ */
+/*     position: relative; */
+/* } */
