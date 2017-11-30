@@ -58,7 +58,7 @@ Y parar cuando estemos suficientemente cerca (más cerca que un ε dado):
 
 Escribimos una implementación de ese concepto de convergencia para
 listas infinitas en Haskell y del método de Newton, basado en la función
-[[http://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html#v:iterate][=iterate=]]:
+[[http://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html#v:iterate][=iterate=]]: 
 
 #+BEGIN_SRC haskell
     limit :: Float -> [Float] -> Float
@@ -75,7 +75,7 @@ listas infinitas en Haskell y del método de Newton, basado en la función
 #+END_SRC
 
 Ahora imaginemos que usamos esta raíz cuadrada recién definida para
-solucionar una ecuación de segundo grado $x^2 + bx + c = 0$:
+solucionar una ecuación de segundo grado $x^2 + bx + c = 0$: 
 
 \[ x = \frac{-b \pm \sqrt{b^2 - 4c}}{2} \]
 
@@ -177,7 +177,7 @@ La idea intuitiva es que =(>>=)= nos permite tomar una función que puede
 devolver errores pero que no comprueba a la entrada si ha recibido un
 error, es decir, de tipo =(a -> Maybe b)= ; y aplicarla sobre una
 función que puede contener un error. La podríamos usar por ejemplo para
-componer varias =sqroot'=, que era algo que hasta ahora no podíamos
+componer varias =sqroot=', que era algo que hasta ahora no podíamos
 hacer sin tratar cada posible caso de error. Y la función =return=, que
 en este caso es simplemente =Just=, nos permite considerar una constante
 como un posible error. Podemos calcular fácilmente así

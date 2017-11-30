@@ -51,23 +51,29 @@ se hace más complejo al aplicarle reducciones y *diverge*.
 Hay expresiones que llegarán a una forma normal o no dependiendo de
 cómo los evaluemos. Por ejemplo,
 
- * $\mathtt{const}\ \mathtt{id}\ \Omega \quad\longrightarrow_{\beta}\quad \mathtt{id}$,
+ * $\mathtt{const}\ \mathtt{id}\ \Omega \longrightarrow_{\beta} \mathtt{id}$,
    llega a forma normal si evaluamos primero $\mathtt{const}$;
 
- * $\mathtt{const}\ \mathtt{id}\ \Omega \quad\longrightarrow_{\beta}\quad \mathtt{const}\ \mathtt{id}\ \Omega$,
+ * $\mathtt{const}\ \mathtt{id}\ \Omega \longrightarrow_{\beta} \mathtt{const}\ \mathtt{id}\ \Omega$,
    no llega a forma normal nunca si empezamos evaluando primero $\Omega$.
 
 Sin embargo, existe una estrategia de reducción que siempre encuentra
 una forma normal si esta existe.
 
-: Si existe una forma normal, la estrategia que reduce a cada paso
-: la aplicación más a la izquierda posible la encuentra.
+#+begin_theorem
+*Proposición*. Si existe una forma normal, la estrategia que reduce a cada paso
+la aplicación más a la izquierda posible la encuentra.
+#+end_theorem
 
-Y quizá sorprendentemente, existe otra estrategia de reducción que siempre
+Y, quizá sorprendentemente, existe otra estrategia de reducción que siempre
 encuentra la forma de no llegar a la forma normal si esta existe
 
-: Si existe alguna sucesión que no llega a forma normal, la estrategia que reduce a cada paso
-: la aplicación más a la derecha posible la encuentra.
+#+begin_theorem
+*Proposición*. Si existe alguna sucesión que no llega a forma normal,
+la estrategia que reduce a cada paso la aplicación más 
+a la derecha posible la encuentra.
+#+end_theorem
 
 Estas dos formas de evaluación se suelen llamar *call-by-value* y
 *call-by-name*.
+
