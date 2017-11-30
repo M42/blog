@@ -4,11 +4,15 @@ import           Data.Monoid (mappend)
 import           Text.Pandoc.Options
 import qualified Data.Set as S
 import           Hakyll
+import           Hakyll.Core.Configuration
 
 
 --------------------------------------------------------------------------------
+conf :: Configuration
+conf = def { destinationDirectory = "docs" }
+
 main :: IO ()
-main = hakyll $ do
+main = hakyllWith conf $ do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
