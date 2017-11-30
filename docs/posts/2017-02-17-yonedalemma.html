@@ -28,14 +28,15 @@
     
 </div>
 
-<h2 id="lema-de-yoneda">Lema de Yoneda</h2>
-<p>Sea <span class="math inline">\(G : {\cal C} \longrightarrow \mathtt{Set}\)</span> un funtor covariante. Fijado <span class="math inline">\(A \in \mathrm{obj}({\cal C})\)</span>, tenemos una biyección entre las transformaciones naturales del funtor <span class="math inline">\(\mathrm{Hom}(A,-)\)</span> a <span class="math inline">\(G\)</span> y los elementos del conjunto <span class="math inline">\(G(A)\)</span>:</p>
+<div class="theorem">
+<p><strong>Lema de Yoneda</strong> Sea <span class="math inline">\(G : {\cal C} \longrightarrow \mathtt{Set}\)</span> un funtor covariante. Fijado <span class="math inline">\(A \in \mathrm{obj}({\cal C})\)</span>, tenemos una biyección entre las transformaciones naturales del funtor <span class="math inline">\(\mathrm{Hom}(A,-)\)</span> a <span class="math inline">\(G\)</span> y los elementos del conjunto <span class="math inline">\(G(A)\)</span>:</p>
 <p><span class="math display">\[
 y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(A,-),G) \longrightarrow G(A)
 \]</span></p>
 <p>Que viene dada por <span class="math inline">\(y(\tau) = \tau_A(1_A)\)</span>, la imagen de la identidad por la transformación natural.</p>
-<h3 id="demostración">Demostración</h3>
-<p>Dado cualquier <span class="math inline">\(p\)</span> crearemos la única transformación natural que cumple <span class="math inline">\(\eta_A(1_A) = p\)</span>. Por definición de transformación natural, sabemos que debe cumplir el siguiente diagrama conmutativo:</p>
+</div>
+<div class="proof">
+<p><strong>Demostración.</strong> Dado cualquier <span class="math inline">\(p\)</span> crearemos la única transformación natural que cumple <span class="math inline">\(\eta_A(1_A) = p\)</span>. Por definición de transformación natural, sabemos que debe cumplir el siguiente diagrama conmutativo:</p>
 <p><span class="math display">\[\require{AMScd}\begin{CD}
 \mathrm{Hom}(A,A)     @&gt;{f \circ \_}&gt;&gt;  \mathrm{Hom}(A,B)\\
 @VV{\eta_{A}}V        @VV{\eta_B}V\\
@@ -51,6 +52,7 @@ GB     @&gt;{Gg}&gt;&gt;  GC
 \end{CD}\]</span></p>
 <p>Y de hecho, dado cualquier elemento <span class="math inline">\(f \in \mathrm{Hom}(A,B)\)</span> tenemos:</p>
 <p><span class="math display">\[Gg\circ \eta(f) = Gg \circ Gf(p) = G(g\circ f)(p) = \eta(g\circ f)\]</span></p>
+</div>
 <h2 id="lema-de-yoneda-caso-contravariante">Lema de Yoneda (caso contravariante)</h2>
 <p>Si aplicamos Yoneda sobre <span class="math inline">\(\mathcal{C}^{op}\)</span>, dado <span class="math inline">\(G : {\cal C} \longrightarrow \mathtt{Set}\)</span> <strong>contravariante</strong> y fijado <span class="math inline">\(A \in obj({\cal C})\)</span>; existe una biyección entre las transformaciones naturales del funtor <span class="math inline">\(Hom(-,A)\)</span> a <span class="math inline">\(G\)</span> y los elementos del conjunto <span class="math inline">\(G(A)\)</span>:</p>
 <p><span class="math display">\[
@@ -58,6 +60,9 @@ y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(-,A),G) \longrightarrow G(A)
 \]</span></p>
 <p>Que viene de nuevo dada por <span class="math inline">\(y(\tau) = \tau_A(1_A)\)</span>.</p>
 <h2 id="referencias-y-enlaces">Referencias y enlaces</h2>
+<p>[1] J. Rotman, An Introduction to Homological Algebra.</p>
+<p>[2] Bartosz Milewski’s Programming Cafe. <a href="https://bartoszmilewski.com/2015/09/01/the-yoneda-lemma/">The Yoneda Lemma</a></p>
+<p>[3] The Catsters. <a href="https://www.youtube.com/watch?v=TLMxHB19khE">Representables and Yoneda 3</a></p>
 
         </div>
 

@@ -2,7 +2,9 @@
 title: Lema de Yoneda
 ---
 
-** Lema de Yoneda
+
+#+begin_theorem
+*Lema de Yoneda*
 Sea $G : {\cal C} \longrightarrow \mathtt{Set}$ un funtor covariante. Fijado $A \in \mathrm{obj}({\cal C})$, tenemos una
 biyección entre las transformaciones naturales del funtor $\mathrm{Hom}(A,-)$ a
 $G$ y los elementos del conjunto $G(A)$:
@@ -13,8 +15,10 @@ y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(A,-),G) \longrightarrow G(A)
 
 Que viene dada por $y(\tau) = \tau_A(1_A)$, la imagen de la identidad por la
 transformación natural.
+#+end_theorem
 
-*** Demostración
+#+begin_proof
+*Demostración.*
 Dado cualquier $p$ crearemos la única transformación natural que cumple
 $\eta_A(1_A) = p$. Por definición de transformación natural, sabemos que debe
 cumplir el siguiente diagrama conmutativo:
@@ -43,6 +47,7 @@ GB     @>{Gg}>>  GC
 Y de hecho, dado cualquier elemento $f \in \mathrm{Hom}(A,B)$ tenemos:
 
 \[Gg\circ \eta(f) = Gg \circ Gf(p) = G(g\circ f)(p) = \eta(g\circ f)\]
+#+end_proof
 
 ** Lema de Yoneda (caso contravariante)
 Si aplicamos Yoneda sobre $\mathcal{C}^{op}$, dado $G : {\cal C} \longrightarrow \mathtt{Set}$ *contravariante*
@@ -56,10 +61,11 @@ y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(-,A),G) \longrightarrow G(A)
 Que viene de nuevo dada por $y(\tau) = \tau_A(1_A)$.
 
 ** Referencias y enlaces
-[1] J. Rotman, An Introduction to Homological Algebra.
 
-[2] Bartosz Milewski's Programming Cafe.
-    [[https://bartoszmilewski.com/2015/09/01/the-yoneda-lemma/][The Yoneda Lemma]]
+ [1] J. Rotman, An Introduction to Homological Algebra.
 
-[3] The Catsters.
-    [[https://www.youtube.com/watch?v=TLMxHB19khE][Representables and Yoneda 3]]
+ [2] Bartosz Milewski's Programming Cafe.
+     [[https://bartoszmilewski.com/2015/09/01/the-yoneda-lemma/][The Yoneda Lemma]]
+
+ [3] The Catsters.
+     [[https://www.youtube.com/watch?v=TLMxHB19khE][Representables and Yoneda 3]]
