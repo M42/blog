@@ -11,6 +11,16 @@ import           Hakyll.Core.Configuration
 conf :: Configuration
 conf = def { destinationDirectory = "docs" }
 
+myFeedConfiguration :: FeedConfiguration
+myFeedConfiguration = FeedConfiguration
+    { feedTitle       = "Logoi"
+    , feedDescription = "Mathematics, logic, and computer science"
+    , feedAuthorName  = "Mario Román"
+    , feedAuthorEmail = "test@example.com"
+    , feedRoot        = "http://m42.github.io/blog"
+    }
+
+
 main :: IO ()
 main = hakyllWith conf $ do
     match "images/*" $ do
@@ -31,6 +41,7 @@ main = hakyllWith conf $ do
         route $ setExtension "html"
         compile $ pandocMathCompiler
             >>= loadAndApplyTemplate "templates/post.html"    postCtx
+            >>= saveSnapshot "content"
             >>= loadAndApplyTemplate "templates/default.html" postCtx
             >>= relativizeUrls
 
@@ -49,6 +60,15 @@ main = hakyllWith conf $ do
                 >>= relativizeUrls
 
     match "templates/*" $ compile templateBodyCompiler
+
+    create ["atom.xml"] $ do
+      route idRoute
+      compile $ do
+        let feedCtx = postCtx `mappend` bodyField "description"
+
+        posts <- fmap (take 10) . recentFirst =<<
+          loadAllSnapshots "posts/*" "content"
+        renderAtom myFeedConfiguration feedCtx posts
 
 
 --------------------------------------------------------------------------------

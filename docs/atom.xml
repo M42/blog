@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Logoi</title>
+    <link href="http://m42.github.io/blog/atom.xml" rel="self" />
+    <link href="http://m42.github.io/blog" />
+    <id>http://m42.github.io/blog/atom.xml</id>
+    <author>
+        <name>Mario Román</name>
+        <email>test@example.com</email>
+    </author>
+    <updated>2017-10-25T00:00:00Z</updated>
+    <entry>
+    <title>Evaluación en el cálculo lambda</title>
+    <link href="http://m42.github.io/blog/posts/2017-10-25-evaluacionlambda.html" />
+    <id>http://m42.github.io/blog/posts/2017-10-25-evaluacionlambda.html</id>
+    <published>2017-10-25T00:00:00Z</published>
+    <updated>2017-10-25T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on October 25, 2017
+    
+</div>
+
+<p>Un repaso de los enunciados que nos llevan a usar la evaluación mediante <em>β</em>-reducciones del cálculo <em>λ</em> como un lenguaje de programación. Detallo todo esto con demostraciones en <a href="https://github.com/M42/lambda.notes">M42/lambda.notes</a>.</p>
+<h2 id="forma-normal">Forma normal</h2>
+<p>Una expresión está en <strong>forma normal</strong> si no se le pueden aplicar más <em>β</em>-reducciones. La forma normal es <em>única</em> como consecuencia del teorema de Church-Rosser.</p>
+<div class="theorem">
+<p><strong>Teorema de Church-Rosser</strong>. Si a un término se le aplican distintas reducciones, los términos que se obtienen pueden reducirse a uno común. Es decir,</p>
+<ul>
+<li>si <span class="math inline">\(A\)</span> puede reducirse mediante <em>β</em>-reducciones a otro término <span class="math inline">\(B\)</span>, lo que se nota por <span class="math inline">\(A \twoheadrightarrow_{\beta} B\)</span>,</li>
+<li>y <span class="math inline">\(A\)</span> puede reducirse también mediante otras <em>β</em>-reducciones, posiblemente distintas o en distinto orden, a <span class="math inline">\(C\)</span>, lo que se escribe como <span class="math inline">\(A \twoheadrightarrow_{\beta} C\)</span>,</li>
+<li>entonces existe un término <span class="math inline">\(D\)</span> tal que ambos se pueden reducir mediante <em>β</em>-reducciones a él; es decir, tal que <span class="math inline">\(B \twoheadrightarrow_{\beta} D\)</span> y <span class="math inline">\(C \twoheadrightarrow_{\beta} D\)</span>.</li>
+</ul>
+</div>
+<p>En particular, esto implica que si un término tuviera dos formas normales, debería existir otro término al cual se pudieran reducir ambas; como son formas normales y no pueden reducirse, esto debe implicar que son iguales.</p>
+<h2 id="divergencia">Divergencia</h2>
+<p>Hemos visto que la forma normal es única, pero no que exista o que sepamos encontrarla de alguna forma. Puede ocurrir que un término no esté en forma normal y sin embargo las reducciones no lo lleven a ella. Por ejemplo,</p>
+<p><span class="math display">\[
+\Omega = (\lambda x.x\ x)(\lambda x.x\ x) \longrightarrow_{\beta} (\lambda x.x\ x)(\lambda x.x\ x)
+\]</span></p>
+<p><strong>no llega a forma normal</strong>. O por ejemplo, <span class="math display">\[
+(\lambda x.x\ x\ x)(\lambda x.x\ x\ x)
+\]</span></p>
+<p>se hace más complejo al aplicarle reducciones y <strong>diverge</strong>.</p>
+<h2 id="evaluación-a-izquierda">Evaluación a izquierda</h2>
+<p>Hay expresiones que llegarán a una forma normal o no dependiendo de cómo los evaluemos. Por ejemplo,</p>
+<ul>
+<li><span class="math inline">\(\mathtt{const}\ \mathtt{id}\ \Omega \longrightarrow_{\beta} \mathtt{id}\)</span>, llega a forma normal si evaluamos primero <span class="math inline">\(\mathtt{const}\)</span>;</li>
+<li><span class="math inline">\(\mathtt{const}\ \mathtt{id}\ \Omega \longrightarrow_{\beta} \mathtt{const}\ \mathtt{id}\ \Omega\)</span>, no llega a forma normal nunca si empezamos evaluando primero <span class="math inline">\(\Omega\)</span>.</li>
+</ul>
+<p>Sin embargo, existe una estrategia de reducción que siempre encuentra una forma normal si esta existe.</p>
+<div class="theorem">
+<p><strong>Proposición</strong>. Si existe una forma normal, la estrategia que reduce a cada paso la aplicación más a la izquierda posible la encuentra.</p>
+</div>
+<p>Y, quizá sorprendentemente, existe otra estrategia de reducción que siempre encuentra la forma de no llegar a la forma normal si esta existe</p>
+<div class="theorem">
+<p><strong>Proposición</strong>. Si existe alguna sucesión que no llega a forma normal, la estrategia que reduce a cada paso la aplicación más a la derecha posible la encuentra.</p>
+</div>
+<p>Estas dos formas de evaluación se suelen llamar <strong>call-by-value</strong> y <strong>call-by-name</strong>.</p>
+]]></summary>
+</entry>
+<entry>
+    <title>Try Mikrokosmos</title>
+    <link href="http://m42.github.io/blog/posts/2017-08-28-trymikrokosmos.html" />
+    <id>http://m42.github.io/blog/posts/2017-08-28-trymikrokosmos.html</id>
+    <published>2017-08-28T00:00:00Z</published>
+    <updated>2017-08-28T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on August 28, 2017
+    
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/codemirror.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/codemirror.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/addon/mode/simple.min.js"></script>
+<script src="https://m42.github.io/mikrokosmos-js/codemirrormkr.js"></script>
+<script language="javascript" src="https://m42.github.io/mikrokosmos-js/rts.js"></script>
+<script language="javascript" src="https://m42.github.io/mikrokosmos-js/lib.js"></script>
+<script language="javascript" src="https://m42.github.io/mikrokosmos-js/out.js"></script>
+<script language="javascript" src="https://m42.github.io/mikrokosmos-js/runmain.js"></script>
+<script language="javascript" src="https://m42.github.io/mikrokosmos-js/mikrobox.js" defer></script>
+
+<style>
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+  overflow-y: hidden;
+}
+.CodeMirror-scroll {
+  height: auto;
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.mikrojs-console {
+  height: auto;
+}
+pre {
+    box-shadow: 0px 0px 1px #eee;
+}
+</style>
+
+<p>Thanks to <a href="https://github.com/ghcjs/ghcjs">GHCJS</a> and <a href="http://codemirror.net/">Codemirror</a>, you can now try the <a href="https://github.com/M42/mikrokosmos">Mikrokosmos</a> lambda interpreter in your browser. Press the <strong>evaluate</strong> button below!</p>
+<div class="mikrojs-console">
+<script type="text/mikrokosmos">
+# Lambda expressions are written with \ or λ, as in
+(λx.x)
+(\x.\y.x)(\x.x)
+
+# Libraries available
+plus 2 3
+sum (cons 1 (cons 2 (cons 3 nil)))
+
+# Untyped, but also simply-typed λ-calculus
+:types on
+swap = \m.(snd m, fst m)
+swap
+
+# Gentzen-style deduction trees
+@@ \z.(snd z,fst z)</script>
+</div>
+
+<p>With this interpreter on my toolkit, I plan to write tutorials on the <em>λ</em>-calculus and the Curry-Howard isomorphism soon. Stay tuned!</p>
+]]></summary>
+</entry>
+<entry>
+    <title>Mikrokosmos 0.3.0</title>
+    <link href="http://m42.github.io/blog/posts/2017-07-22-mikrokosmos030.html" />
+    <id>http://m42.github.io/blog/posts/2017-07-22-mikrokosmos030.html</id>
+    <published>2017-07-22T00:00:00Z</published>
+    <updated>2017-07-22T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on July 22, 2017
+    
+</div>
+
+<p>Mikrokosmos version 0.3.0 is out! This version comes bundled with a Jupyter Notebook kernel, a tutorial on lambda calculus and specific modes for SKI combinators.</p>
+<ul>
+<li><a href="https://github.com/m42/mikrokosmos">GitHub repository</a>.</li>
+<li><a href="https://m42.github.io/mikrokosmos/">User’s guide</a>.</li>
+<li><a href="https://github.com/M42/jupyter-mikrokosmos">Jupyter kernel</a>.</li>
+</ul>
+]]></summary>
+</entry>
+<entry>
+    <title>Capturando links en org-mode</title>
+    <link href="http://m42.github.io/blog/posts/2017-03-23-capturelinks.html" />
+    <id>http://m42.github.io/blog/posts/2017-03-23-capturelinks.html</id>
+    <published>2017-03-23T00:00:00Z</published>
+    <updated>2017-03-23T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on March 23, 2017
+    
+</div>
+
+<h2 id="capturando-links">Capturando links</h2>
+<p>El objetivo de este post es describir el proceso que uso para capturar links desde Firefox y almacenarlos en un archivo de org-mode, que puede leerse luego desde el propio navegador.</p>
+<h2 id="org-capture">Org-capture</h2>
+<p>La primera parte será activar <code>org-capture</code> y <code>org-protocol</code> en Emacs. <a href="https://www.gnu.org/software/emacs/manual/html_node/org/Capture.html#Capture">org-capture</a> puede ser usado también para escribir pequeñas ideas y almacenarlas en ficheros org rápidamente; pero, en este caso, lo usaremos sólo para recibir el link desde Firefox.</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">require</span> &#39;org-protocol)</code></pre></div>
+<p>Lo primero que debemos hacer es definir la plantilla que queremos usar para capturar los links. La sintaxis usada se explica en la <a href="https://www.gnu.org/software/emacs/manual/html_node/org/Template-expansion.html#Template-expansion">documentación</a> de org-mode, así como las opciones que usa después:</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">setq</span> org-capture-templates
+  (<span class="kw">quote</span> (
+      (<span class="st">&quot;x&quot;</span> <span class="st">&quot;org-protocol&quot;</span> entry (file <span class="st">&quot;~/links.org&quot;</span>)
+       <span class="st">&quot;** %c %?&quot;</span> :kill-buffer <span class="kw">t</span> :prepend <span class="kw">t</span>))))</code></pre></div>
+<p>En este caso, guardará los links en un archivo llamado <code>links.org</code> en el directorio <code>home</code>. Pueden añadirse <a href="https://www.gnu.org/software/emacs/manual/html_node/org/Template-elements.html#Template-elements">opciones</a> para explicitar en qué punto exacto del archivo queremos insertar el link una vez lo capturemos.</p>
+<h2 id="extensión-de-firefox">Extensión de firefox</h2>
+<p>El uso de <code>org-protocol</code> desde Firefox puede gestionarse más detalladamente usando <a href="http://orgmode.org/worg/org-contrib/org-protocol.html#sec-4">marcadores</a> que activen la captura. En nuestro caso, como sólo necesitamos la configuración básica, podemos ahorrarnos este trabajo y dejárselo a la extensión <a href="http://chadok.info/firefox-org-capture/">org-capture for Firefox</a>.</p>
+<p>La extensión nos deja elegir en sus opciones si queremos que use una nueva ventana (me parece lo más conveniente y además veremos cómo controlarla luego con i3); la letra asignada a la plantilla (en nuestro caso hemos usado la <code>x</code> en la configuración anterior); y el atajo de teclado para activarla, que por defecto es <code>Ctrl-Alt-r</code>.</p>
+<p>Una vez activemos la extensión, podremos capturar enlaces pulsando el atajo.</p>
+<h2 id="cerrando-ventanas">Cerrando ventanas</h2>
+<p>Un problema menor al usar esta extensión es que crea ventanas de Emacs que no cierra al terminar. Otro problema es que suele crear también un buffer inicial al lado de nuestro buffer de captura. Podemos usar <strong>hooks</strong> para forzarlo a corregir ese comportamiento:</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(add-hook &#39;org-capture-mode-hook &#39;delete-other-windows)
+(add-hook &#39;org-capture-after-finalize-hook &#39;delete-frame)</code></pre></div>
+<h2 id="integrándolo-en-i3">Integrándolo en i3</h2>
+<p>Para los usuarios de i3, puede ser útil poder controlar dónde y cómo se crea la ventana de captura de Emacs. Un ejemplo de configuración es la siguiente, que coloca la ventana como flotante y en el centro de la pantalla; como si fuera un popup:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">for_window</span> [class=<span class="st">&quot;Emacs&quot;</span> title=<span class="st">&quot;CAPTURE&quot;</span>] floating enable
+<span class="ex">for_window</span> [class=<span class="st">&quot;Emacs&quot;</span> title=<span class="st">&quot;CAPTURE&quot;</span>] resize set 1880 480
+<span class="ex">for_window</span> [class=<span class="st">&quot;Emacs&quot;</span> title=<span class="st">&quot;CAPTURE&quot;</span>] move position center</code></pre></div>
+<h2 id="mostrando-los-links-en-el-navegador">Mostrando los links en el navegador</h2>
+<p>Para que además los links se muestren en el navegador, pueden usarse también <strong>hooks</strong> que se activen al guardado para exportar a HTML. En este post de <a href="https://rafaelleru.github.io/2017/01/22/to_read_list_emacs/"><span class="citation">@rafaelleru</span></a> se explica el proceso en detalle.</p>
+<h2 id="un-detalle-sin-solucionar">Un detalle sin solucionar</h2>
+<p>En la plantilla de captura, me gustaría poder usar además <code>%^g</code>, que crea un pequeño diálogo donde insertar tags al link que se está guardando. El problema con esto es que, hasta que ese diálogo no ha terminado, no se ejecutan los hooks y el frame no se hace único (ni se reposiciona en i3).</p>
+]]></summary>
+</entry>
+<entry>
+    <title>Projective, injective, and flat modules</title>
+    <link href="http://m42.github.io/blog/posts/2017-02-18-projectivemodules.html" />
+    <id>http://m42.github.io/blog/posts/2017-02-18-projectivemodules.html</id>
+    <published>2017-02-18T00:00:00Z</published>
+    <updated>2017-02-18T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on February 18, 2017
+    
+</div>
+
+<h2 id="definitions">Definitions</h2>
+<p>An R-module <span class="math inline">\(D\)</span> is:</p>
+<ol>
+<li><strong>Projective</strong> if <span class="math inline">\(Hom(D, -)\)</span> is an exact functor.</li>
+<li><strong>Injective</strong> if <span class="math inline">\(Hom(-,D)\)</span> is an exact functor.</li>
+<li><strong>Flat</strong> if <span class="math inline">\(D \otimes -\)</span> is an exact functor.</li>
+</ol>
+<h2 id="characterization">Characterization</h2>
+<p>We know that <span class="math inline">\(Hom(D,-)\)</span> and <span class="math inline">\(Hom(-,D)\)</span> are left-exact and that <span class="math inline">\(D\otimes -\)</span> is right-exact; so for them to be exact, we only need:</p>
+<ul>
+<li><p>A module <span class="math inline">\(D\)</span> is <strong>projective</strong> when every <span class="math inline">\(f : B \longrightarrow C\)</span> surjective induces <span class="math inline">\((f\circ\_) :Hom(D,B) \longrightarrow Hom(D,C)\)</span> surjective.</p>
+<p><a href="https://raw.githubusercontent.com/M42/m42.github.io/images/projective.jpeg" class="uri">https://raw.githubusercontent.com/M42/m42.github.io/images/projective.jpeg</a></p></li>
+<li><p>A module <span class="math inline">\(D\)</span> is <strong>injective</strong> when <span class="math inline">\(f : A \longrightarrow B\)</span> surjective induces <span class="math inline">\((\_\circ f) : Hom(B,D) \longrightarrow Hom(A,D)\)</span> surjective.</p>
+<p><a href="https://raw.githubusercontent.com/M42/m42.github.io/images/injective.jpeg" class="uri">https://raw.githubusercontent.com/M42/m42.github.io/images/injective.jpeg</a></p></li>
+<li><p>A module <span class="math inline">\(D\)</span> is <strong>flat</strong> when <span class="math inline">\(f : A \longrightarrow B\)</span> injective induces <span class="math inline">\(f&#39; : D\otimes A \longrightarrow D \otimes B\)</span> injective.</p></li>
+</ul>
+]]></summary>
+</entry>
+<entry>
+    <title>Lema de Yoneda</title>
+    <link href="http://m42.github.io/blog/posts/2017-02-17-yonedalemma.html" />
+    <id>http://m42.github.io/blog/posts/2017-02-17-yonedalemma.html</id>
+    <published>2017-02-17T00:00:00Z</published>
+    <updated>2017-02-17T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on February 17, 2017
+    
+</div>
+
+<div class="theorem">
+<p><strong>Lema de Yoneda</strong> Sea <span class="math inline">\(G : {\cal C} \longrightarrow \mathtt{Set}\)</span> un funtor covariante. Fijado <span class="math inline">\(A \in \mathrm{obj}({\cal C})\)</span>, tenemos una biyección entre las transformaciones naturales del funtor <span class="math inline">\(\mathrm{Hom}(A,-)\)</span> a <span class="math inline">\(G\)</span> y los elementos del conjunto <span class="math inline">\(G(A)\)</span>:</p>
+<p><span class="math display">\[
+y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(A,-),G) \longrightarrow G(A)
+\]</span></p>
+<p>Que viene dada por <span class="math inline">\(y(\tau) = \tau_A(1_A)\)</span>, la imagen de la identidad por la transformación natural.</p>
+</div>
+<div class="proof">
+<p><strong>Demostración.</strong> Dado cualquier <span class="math inline">\(p\)</span> crearemos la única transformación natural que cumple <span class="math inline">\(\eta_A(1_A) = p\)</span>. Por definición de transformación natural, sabemos que debe cumplir el siguiente diagrama conmutativo:</p>
+<p><span class="math display">\[\require{AMScd}\begin{CD}
+\mathrm{Hom}(A,A)     @&gt;{f \circ \_}&gt;&gt;  \mathrm{Hom}(A,B)\\
+@VV{\eta_{A}}V        @VV{\eta_B}V\\
+GA     @&gt;{Gf}&gt;&gt;  GB
+\end{CD}\]</span></p>
+<p>Lo que deja determinado a cualquier <span class="math inline">\(\eta_B(f)\)</span>, y por tanto a toda la función:</p>
+<p><span class="math display">\[\eta_B(f) = \eta_B(f\circ id) = Gf(\eta_A(id_A)) = Gf(p) \]</span></p>
+<p>Nos falta comprobar que la función así construida es de hecho una transformación natural. Es decir, que cumple el siguiente diagrama conmutativo:</p>
+<p><span class="math display">\[\require{AMScd}\begin{CD}
+\mathrm{Hom}(A,B)     @&gt;{g \circ \_}&gt;&gt;  \mathrm{Hom}(A,C)\\
+@VV{\eta_B}V        @VV{\eta_C}V\\
+GB     @&gt;{Gg}&gt;&gt;  GC
+\end{CD}\]</span></p>
+<p>Y de hecho, dado cualquier elemento <span class="math inline">\(f \in \mathrm{Hom}(A,B)\)</span> tenemos:</p>
+<p><span class="math display">\[Gg\circ \eta(f) = Gg \circ Gf(p) = G(g\circ f)(p) = \eta(g\circ f)\]</span></p>
+</div>
+<h2 id="lema-de-yoneda-caso-contravariante">Lema de Yoneda (caso contravariante)</h2>
+<p>Si aplicamos Yoneda sobre <span class="math inline">\(\mathcal{C}^{op}\)</span>, dado <span class="math inline">\(G : {\cal C} \longrightarrow \mathtt{Set}\)</span> <strong>contravariante</strong> y fijado <span class="math inline">\(A \in obj({\cal C})\)</span>; existe una biyección entre las transformaciones naturales del funtor <span class="math inline">\(Hom(-,A)\)</span> a <span class="math inline">\(G\)</span> y los elementos del conjunto <span class="math inline">\(G(A)\)</span>:</p>
+<p><span class="math display">\[
+y : \mathrm{Nat}(\mathrm{Hom}_{\cal C}(-,A),G) \longrightarrow G(A)
+\]</span></p>
+<p>Que viene de nuevo dada por <span class="math inline">\(y(\tau) = \tau_A(1_A)\)</span>.</p>
+<h2 id="referencias-y-enlaces">Referencias y enlaces</h2>
+<p>[1] J. Rotman, An Introduction to Homological Algebra.</p>
+<p>[2] Bartosz Milewski’s Programming Cafe. <a href="https://bartoszmilewski.com/2015/09/01/the-yoneda-lemma/">The Yoneda Lemma</a></p>
+<p>[3] The Catsters. <a href="https://www.youtube.com/watch?v=TLMxHB19khE">Representables and Yoneda 3</a></p>
+]]></summary>
+</entry>
+<entry>
+    <title>Mónadas</title>
+    <link href="http://m42.github.io/blog/posts/2016-12-24-monadas.html" />
+    <id>http://m42.github.io/blog/posts/2016-12-24-monadas.html</id>
+    <published>2016-12-24T00:00:00Z</published>
+    <updated>2016-12-24T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on December 24, 2016
+    
+</div>
+
+<blockquote>
+<p>A monad is just a monoid in the category of endofunctors, what’s the problem?</p>
+<p>– <strong>Philip Walder</strong> (apócrifa) en <em><a href="http://james-iry.blogspot.com.es/2009/05/brief-incomplete-and-mostly-wrong.html">A Brief, Incomplete, and Mostly Wrong History of programming languages</a></em></p>
+</blockquote>
+<h2 id="prerrequisitos">Prerrequisitos</h2>
+<p>Este artículo requiere un conocimiento previo de Haskell, o al menos, de otro lenguaje de programación funcional. Puedes consultar nuestra <a href="http://tux.ugr.es/dgiim/blog/2014/10/01/intro-haskell/">introducción a Haskell</a> con recursos para iniciarte en el lenguaje.</p>
+<p>Por otro lado, para la segunda parte del artículo es recomendable conocimiento previo sobre teoría de categorías. Aun así, no es necesaria para leer la primera parte del artículo, donde hablamos de mónadas sin hacer ninguna referencia explícita a la teoría de categorías. Si quieres leer sobre ese tema, puedes consultar nuestros apuntes de <a href="http://tux.ugr.es/dgiim/blog/2014/10/04/intro-categorias/">introducción a teoría de categorías</a>.</p>
+<h2 id="motivación-para-las-mónadas">Motivación para las mónadas</h2>
+<h3 id="mónadas-en-haskell">Mónadas en Haskell</h3>
+<p>Imaginemos que necesitamos controlar cuando una función interna devuelve un error, o cuando usa un estado que debe ser pasado al resto de funciones. Cuando trabajamos con programación funcional pura, debemos devolver explícitamente el error (señalar cómo va a tratarlo cada función) o pasar el estado como argumento a cada una de las funciones; así que una solución sería modificar cada una de las funciones que usamos para que tenga en cuenta ese estado o ese caso de error, pero esto añadiría mucha complejidad innecesaria a nuestro código. La estructura de mónada simplifica esta escritura.</p>
+<p>El siguiente ejemplo, en el que tratamos el manejo de errores encapsulado en una mónada, está inspirado en los ejemplos de:</p>
+<ul>
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/papers/marktoberdorf/baastad.pdf">Monads for functional programming</a> - <em>Philip Wadler</em></li>
+</ul>
+<p>Que es una muy buena introducción al uso de las mónadas en programación funcional.</p>
+<h3 id="calculando-raíces-cuadradas">Calculando raíces cuadradas</h3>
+<p>Por ejemplo, supongamos que intentamos sacar raíces cuadradas en los reales usando el <a href="https://en.wikipedia.org/wiki/Integer_square_root#Algorithm">método de Newton</a>. Si intentamos calcular <span class="math inline">\(\sqrt{n}\)</span>, podemos tomar a cada paso la aproximación:</p>
+<p><span class="math display">\[ x_{k+1} = \frac{1}{2}\left( x_k+\frac{n}{x_k} \right) \]</span></p>
+<p>Y parar cuando estemos suficientemente cerca (más cerca que un ε dado):</p>
+<p><span class="math display">\[ |x_{k+1} - x_k| &lt; \varepsilon \]</span></p>
+<p>Escribimos una implementación de ese concepto de convergencia para listas infinitas en Haskell y del método de Newton, basado en la función <a href="http://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html#v:iterate"><code>iterate</code></a>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">limit ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> [<span class="dt">Float</span>] <span class="ot">-&gt;</span> <span class="dt">Float</span>
+limit epsilon (x<span class="fu">:</span>y<span class="fu">:</span>xs)
+  <span class="fu">|</span> abs (x<span class="fu">-</span>y) <span class="fu">&lt;</span> epsilon <span class="fu">=</span> y
+  <span class="fu">|</span> otherwise           <span class="fu">=</span> limit epsilon (y<span class="fu">:</span>xs)
+
+<span class="ot">newtonaprox ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span>
+newtonaprox n x <span class="fu">=</span> (x <span class="fu">+</span> n<span class="fu">/</span>x)<span class="fu">/</span><span class="dv">2</span>
+
+<span class="ot">sqroot ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span>
+sqroot <span class="dv">0</span> <span class="fu">=</span> <span class="dv">0</span>
+sqroot x <span class="fu">=</span> limit <span class="fl">0.03</span> (iterate (newtonaprox x) x)</code></pre></div>
+<p>Ahora imaginemos que usamos esta raíz cuadrada recién definida para solucionar una ecuación de segundo grado <span class="math inline">\(x^2 + bx + c = 0\)</span>:</p>
+<p><span class="math display">\[ x = \frac{-b \pm \sqrt{b^2 - 4c}}{2} \]</span></p>
+<p>Podemos definir una estructura de datos <code>QPol</code> para el polinomio y una función que lo resuelva obteniendo sus dos raíces:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">QPol</span> <span class="fu">=</span> <span class="dt">QPol</span> <span class="dt">Float</span> <span class="dt">Float</span> <span class="dt">Float</span>
+
+<span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">QPol</span> <span class="kw">where</span>
+    show (<span class="dt">Qpol</span> a b c) <span class="fu">=</span> show a <span class="fu">++</span> <span class="st">&quot;x² + &quot;</span> <span class="fu">++</span> show b <span class="fu">++</span> <span class="st">&quot;x + &quot;</span> show c
+
+<span class="ot">solve ::</span> <span class="dt">QPol</span> <span class="ot">-&gt;</span> (<span class="dt">Float</span>,<span class="dt">Float</span>)
+solve (<span class="dt">QPol</span> a b c) <span class="fu">=</span> (sol1 sol2)
+    <span class="kw">where</span> sol1 <span class="fu">=</span> ((<span class="fu">-</span>b) <span class="fu">+</span> sqroot(b<span class="fu">*</span>b<span class="fu">-</span><span class="dv">4</span><span class="fu">*</span>c<span class="fu">*</span>a))<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a)
+          sol2 <span class="fu">=</span> ((<span class="fu">-</span>b) <span class="fu">-</span> sqroot(b<span class="fu">*</span>b<span class="fu">-</span><span class="dv">4</span><span class="fu">*</span>c<span class="fu">*</span>a))<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a)</code></pre></div>
+<p>Y podemos comprobar que funciona:</p>
+<pre class="example"><code>λ&gt; pol = QPol 1 (-5) 6
+λ&gt; putStrLn $ &quot;Las soluciones de &quot; ++ show pol ++ &quot; son &quot; ++ solve pol
+Las soluciones de 1.0x² + -5.0x + 6.0 son (3.0,2.0)
+</code></pre>
+<h3 id="controlando-los-errores">Controlando los errores</h3>
+<p>Pero ¿qué ocurre cuando intentamos calcular la raíz cuadrada de un número no positivo? Este método no la encuentra, por lo que debería devolver un error antes de intentar empezar a calcularla. La solución obvia es reflejar este error con un <code>Maybe</code> en el cálculo de la raíz cuadrada.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">sqroot&#39; ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span>
+sqroot&#39; x
+  <span class="fu">|</span> x <span class="fu">&lt;</span> <span class="dv">0</span>     <span class="fu">=</span> <span class="dt">Nothing</span>
+  <span class="fu">|</span> x <span class="fu">==</span> <span class="dv">0</span>    <span class="fu">=</span> <span class="dt">Just</span> <span class="fl">0.0</span>
+  <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="dt">Just</span> ( limit <span class="fl">0.03</span> (iterate (newtonsqrt x) x) )</code></pre></div>
+<p>Esto lo soluciona, pero nos crea un problema mayor. La función <code>solve</code> está usando la raíz cuadrada y se espera de ella que devuelva un número, no un posible error. Si queremos conseguir que funcione con la nueva =sqroot’=, necesitaríamos implementar todas sus componentes internas teniendo en cuenta ese error. Por ejemplo, deberíamos reescribir el <code>(+)</code>, para tener en cuenta errores y propagarlos por todos los cálculos involucrando a =sqroot’=:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">(+.) ::</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span>
+(<span class="fu">+.</span>) <span class="dt">Nothing</span> _ <span class="fu">=</span> <span class="dt">Nothing</span>
+(<span class="fu">+.</span>) _ <span class="dt">Nothing</span> <span class="fu">=</span> <span class="dt">Nothing</span>
+(<span class="fu">+.</span>) (<span class="dt">Just</span> a) (<span class="dt">Just</span> b) <span class="fu">=</span> <span class="dt">Just</span> (a <span class="fu">+</span> b)</code></pre></div>
+<p>Pero esto es muy pesado de implementar; deberíamos implementarlo ¡para cada una de las operaciones que usen la raíz cuadrada en algún punto! Esto obliga a cada una de nuestras operaciones intermedias a ser conscientes de la posibilidad de error, dándonos código mucho menos modular y reusable.</p>
+<p>Una solución ligeramente mejor es la de abstraer este proceso de hacer a una función consciente de la posibilidad de error en una función aparte y definir las demás en función suya:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">errorAware ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b <span class="ot">-&gt;</span> <span class="dt">Maybe</span> c
+errorAware op <span class="dt">Nothing</span> _ <span class="fu">=</span> <span class="dt">Nothing</span>
+errorAware op _ <span class="dt">Nothing</span> <span class="fu">=</span> <span class="dt">Nothing</span>
+errorAware op (<span class="dt">Just</span> a) (<span class="dt">Just</span> b) <span class="fu">=</span> <span class="dt">Just</span> (op a b)
+
+(<span class="fu">+.</span>),<span class="ot"> (*.) ::</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span>
+(<span class="fu">+.</span>) <span class="fu">=</span> errorAware (<span class="fu">+</span>)
+(<span class="fu">*.</span>) <span class="fu">=</span> errorAware (<span class="fu">*</span>)</code></pre></div>
+<p>Esto nos permite hacer cálculos con ellas:</p>
+<pre class="example"><code>λ&gt; sqroot&#39; (-3) +. Just 4
+Nothing
+λ&gt; sqroot&#39; 3 +. Just 4
+Just 5.732143
+</code></pre>
+<h3 id="la-mónada-maybe">La mónada Maybe</h3>
+<p>Esta idea para simplificar el tratamiento de errores, realizada correctamente, es lo que nos va a proporcionar la estructura de mónada. En Haskell, podemos definir una mónada como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Monad</span> m <span class="kw">where</span>
+<span class="ot">  (&gt;&gt;=)  ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+<span class="ot">  return ::</span> a <span class="ot">-&gt;</span> m a</code></pre></div>
+<p>La idea intuitiva es que <code>(&gt;&gt;</code>)= nos permite tomar una función que puede devolver errores pero que no comprueba a la entrada si ha recibido un error, es decir, de tipo <code>(a -&gt; Maybe b)</code> ; y aplicarla sobre una función que puede contener un error. La podríamos usar por ejemplo para componer varias <code>sqroot</code>’, que era algo que hasta ahora no podíamos hacer sin tratar cada posible caso de error. Y la función <code>return</code>, que en este caso es simplemente <code>Just</code>, nos permite considerar una constante como un posible error. Podemos calcular fácilmente así <span class="math display">\[\sqrt{\sqrt{3}}\]</span> teniendo en cuenta los casos de error:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">sqroot&#39; (sqroot&#39; <span class="dv">3</span>)              <span class="co">-- ¡Error de tipos!</span>
+sqroot&#39; <span class="dv">3</span> <span class="fu">&gt;&gt;=</span> sqroot&#39;            <span class="co">-- Usando mónadas</span>
+<span class="dt">Just</span>   <span class="dv">3</span> <span class="fu">&gt;&gt;=</span> sqroot&#39; <span class="fu">&gt;&gt;=</span> sqroot&#39; <span class="co">-- Usando Just</span>
+return <span class="dv">3</span> <span class="fu">&gt;&gt;=</span> sqroot&#39; <span class="fu">&gt;&gt;=</span> sqroot&#39; <span class="co">-- Equivalente a lo anterior</span></code></pre></div>
+<h3 id="notación-do">Notación do</h3>
+<p>Las mónadas definen las funciones anteriores y muchas más que no vamos a tratar ahora mismo, pero como resultado, nos acaban ofreciendo la <strong><a href="https://en.wikibooks.org/wiki/Haskell/do_notation">notación do</a></strong>, que es la que podemos usar para acabar escribiendo nuestra función <code>solve</code> como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">solve ::</span> <span class="dt">QPol</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">Float</span>,<span class="dt">Float</span>)
+solve (<span class="dt">QPol</span> a b c) <span class="fu">=</span> <span class="kw">do</span>
+  discriminant <span class="ot">&lt;-</span> sqroot&#39; (b<span class="fu">*</span>b <span class="fu">-</span> <span class="dv">4</span><span class="fu">*</span>c<span class="fu">*</span>a)
+  return (((<span class="fu">-</span>b) <span class="fu">+</span> discriminant)<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a), ((<span class="fu">-</span>b) <span class="fu">-</span> discriminant)<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a))</code></pre></div>
+<p>En la primera línea tenemos en cuenta que la función <code>sqroot</code> puede producir error, y en la segunda simplemente usamos el <em>posible</em> resultado de ella sin tener que preocuparnos por el resto de funciones.</p>
+<p>Nótese que la notación <strong>do</strong> es sólo una notación diseñada para aliviar la escritura de operaciones con mónadas en algunos casos particulares; es sólo <em>azúcar sintáctico</em> para operaciones que no dejan de ser puramente funcionales. Existen críticas al uso de esta notación. <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<h2 id="mónadas-en-programación-funcional">Mónadas en programación funcional</h2>
+<h3 id="mónadas-como-clase-de-tipos">Mónadas como clase de tipos</h3>
+<p>Las mónadas en Haskell están definidas como una clase de tipos teniendo:</p>
+<ul>
+<li>Un <strong>constructor</strong> de tipos <code>m ∷ * -&gt; *</code>, que para cada tipo <code>a</code>, devuelve una mónada conteniéndolo, <code>m a</code>.</li>
+<li>Una <strong>función</strong> <code>return ∷ a -&gt; m a</code>, que para todo elemento de tipo <code>a</code>, devuelve una mónada que lo contiene.</li>
+<li>Una <strong>función</strong> <code>(&gt;&gt;=) ∷ m a -&gt; (a -&gt; m b) -&gt; m b</code>, que dada una mónada y una función que se aplique sobre su interior y devuelva otra mónada, devuelve la mónada resultante. Sirve como composición de funciones monádicas.</li>
+</ul>
+<p>La existencia de la última función equivale a la existencia de otras dos funciones <code>fmap ∷ (a -&gt; b) -&gt; m a -&gt; m b</code> y <code>join ∷ m (m a) -&gt; m a</code>.</p>
+<p>Nótese entonces que para ser mónada, una clase de tipos debe ser primero un funtor. Dentro de los funtores que conocemos, podemos reconocer algunas mónadas, incluyendo la mónada <code>Maybe</code> que hemos usado hasta ahora:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Return de la mónada Maybe</span>
+return x <span class="fu">=</span> <span class="dt">Just</span> x
+
+<span class="co">-- Bind de la mónada Maybe</span>
+(<span class="dt">Just</span> x) <span class="fu">&gt;&gt;=</span> k <span class="fu">=</span> k x
+<span class="dt">Nothing</span>  <span class="fu">&gt;&gt;=</span> _ <span class="fu">=</span> <span class="dt">Nothing</span>
+
+<span class="co">-- Return de la mónada List</span>
+return x <span class="fu">=</span> [x]
+
+<span class="co">-- Bind de la mónada List</span>
+xs <span class="fu">&gt;&gt;=</span> f <span class="fu">=</span> [y <span class="fu">|</span> x <span class="ot">&lt;-</span> xs, y <span class="ot">&lt;-</span> f x]</code></pre></div>
+<p>Puedes empezar a leer tutoriales sobre el uso de las mónadas en Haskell en:</p>
+<ul>
+<li><a href="http://learnyouahaskell.com/a-fistful-of-monads">A fistful of monads - Learn you a Haskell</a></li>
+<li><a href="https://en.wikibooks.org/wiki/Haskell/Understanding_monads">Understanding monads - Wikibooks</a></li>
+</ul>
+<h3 id="mónada-lista">Mónada lista</h3>
+<p>En las listas, por ejemplo, tenemos como candidato para <code>join :: [[a]] -&gt; [a]</code> la concatenación de listas, <code>concat</code>. Nuestro <code>return :: a -&gt; [a]</code> será simplemente incluir un elemento en una lista que sólo lo contenga a él.</p>
+<p>En esta mónada, <code>(&gt;&gt;</code>)= mapea una función <code>a -&gt; [a]</code> sobre cada elemento de la lista y concatena todos los resultados:</p>
+<pre class="example"><code>λ&gt; [1,2,3] &gt;&gt;= (replicate 3)
+[1,1,1,2,2,2,3,3,3]
+</code></pre>
+<p>Nótese que, de la misma manera en la que podemos usar <code>(&gt;&gt;</code>)=, podemos usar una versión con sus parámetros cambiados de orden, <code>(=&lt;&lt;)</code>. Aquí usamos la mónada lista para enumerar los racionales repitiendo elementos:<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.List</span>
+<span class="kw">import </span><span class="dt">Data.Ratio</span>
+
+<span class="co">-- Crea los racionales con denominador n</span>
+<span class="ot">withDenom ::</span> <span class="dt">Integral</span> <span class="ot">-&gt;</span> [<span class="dt">Rational</span>]
+withDenom n <span class="fu">=</span> map (<span class="fu">%</span>n) [<span class="dv">1</span><span class="fu">..</span>]
+
+<span class="co">-- Para cada entero, crea los racionales que lo</span>
+<span class="co">-- tienen como denominador</span>
+<span class="ot">rationalsDup ::</span> [<span class="dt">Rational</span>]
+rationalsDup <span class="fu">=</span> withDenom <span class="fu">=&lt;&lt;</span> [<span class="dv">1</span><span class="fu">..</span>]
+
+<span class="co">-- Evita duplicados con &#39;nub&#39;</span>
+<span class="ot">rationals ::</span> [<span class="dt">Rational</span>]
+rationals <span class="fu">=</span> nub rationalsDup</code></pre></div>
+<h3 id="mónada-io">Mónada IO</h3>
+<p>La mónada IO surge como una solución al problema de implementar efectos secundarios (como la lectura o escritura) en un lenguaje puro y de forma extensible, sin tener que alterar el sistema de tipos y respetando el orden en el que queremos que se ejecuten.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">greeting ::</span> <span class="dt">IO</span> ()
+greeting <span class="fu">=</span> fmap (<span class="st">&quot;Hola, &quot;</span><span class="fu">++</span>) getLine <span class="fu">&gt;&gt;=</span> print</code></pre></div>
+<p>Pueden leerse más detalles sobre mónada IO y su implementación en:</p>
+<ul>
+<li><a href="http://chris-taylor.github.io/blog/2013/02/09/io-is-not-a-side-effect/">IO is pure</a> - Chris Taylor</li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/1993/01/imperative.pdf">Imperative functional programming</a> - Simon L. Peyton Jones, Philip Wadler</li>
+<li><a href="https://blog.jle.im/entry/first-class-statements">First-Class “Statements”</a> - Justin Le</li>
+</ul>
+<h3 id="mónada-estado">Mónada estado</h3>
+<p>En ocasiones necesitamos que nuestras funciones conserven un estado además de realizar sus operaciones. Para esos casos existe la mónada estado <code>State s</code>, que guarda un valor de estado de tipo <code>s</code>. Podemos pensar en <code>State s a</code> como <code>s -&gt; (a,s)</code>; es decir, un elemento dentro de la mónada es una función dispuesta a tomar un estado inicial y a devolver algún elemento junto a un estado final.</p>
+<p>Existen tutoriales sobre la mónada estado en:</p>
+<ul>
+<li><a href="https://wiki.haskell.org/State_Monad">State Monad - Haskell wiki</a></li>
+<li><a href="http://learnyouahaskell.com/for-a-few-monads-more">For a few monads more - Learn you a Haskell</a></li>
+<li><a href="http://brandon.si/code/the-state-monad-a-tutorial-for-the-confused/">The State Monad: a tutorial for the confused - Brandon Simmons</a></li>
+<li><a href="http://adit.io/posts/2013-06-10-three-useful-monads.html">Three useful monads - Aditya Bhargava</a></li>
+</ul>
+<p>Un uso de la mónada estado puede ser el guardar la semilla de una generación pseudoaleatoria de números usando <a href="https://en.wikipedia.org/wiki/Linear_congruential_generator">generadores lineales congruenciales</a>. En concreto, usaremos la fórmula iterativa <span class="math inline">\(x_{i+1} \equiv 16807x_i \text{ mod } 2147483647\)</span>, que se expone <a href="https://math.dartmouth.edu/archive/m20f11/public_html/RANDOMNESS_LCG.pdf">aquí</a>. Con este generador podremos escribir dados de un número dado de caras y llamarlos varias veces. El estado interno pasará la semilla aleatoria de un dado al siguiente:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Control.Monad.State</span>
+<span class="kw">type</span> <span class="dt">Seed</span> <span class="fu">=</span> <span class="dt">Int</span>
+
+<span class="ot">dice ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Seed</span> <span class="dt">Int</span>
+dice n <span class="fu">=</span> state (\s <span class="ot">-&gt;</span> (s <span class="ot">`mod`</span> n <span class="fu">+</span> <span class="dv">1</span>, <span class="dv">16807</span><span class="fu">*</span>s <span class="ot">`mod`</span> <span class="dv">2147483647</span>))</code></pre></div>
+<p>Y podríamos llamarlo con la semilla <code>1000</code> de la forma siguiente; que nos devolverá por un lado el resultado de la tirada y por otro lado la nueva semilla:</p>
+<pre class="example"><code>λ&gt; runState (dice 6) 1000
+(5,1660)
+</code></pre>
+<p>Si queremos hacer varias tiradas seguidas, podemos usar <code>replicateM :: Int -&gt; m a -&gt; m [a]</code>, que se encarga de pasar internamente la semilla de cada tirada a la siguiente tirada:</p>
+<pre class="example"><code>λ&gt; fst (runState (replicateM 100 (dice 6)) 1037)
+
+[6,6,2,5,4,3,6,1,4,6,3,6,4,4,6,3,5,1,5,2,6,4,2,6,4,2,4,
+5,1,6,5,4,1,3,5,4,6,4,2,3,4,2,1,1,6,5,5,4,1,1,4,6,5,3,6,
+3,1,1,5,1,4,1,2,3,5,5,4,5,3,3,2,6,4,1,1,1,2,5,4,5,2,4,5,
+6,1,2,4,3,3,6,4,6,3,4,5,1,4,2,2,2]
+</code></pre>
+<p>Incluso podemos crear nuevos generadores aleatorios a partir de los anteriores con las operaciones usuales:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">twodices ::</span> <span class="dt">State</span> <span class="dt">Seed</span> <span class="dt">Int</span>
+twodices <span class="fu">=</span> <span class="kw">do</span>
+    a <span class="ot">&lt;-</span> dice <span class="dv">6</span>
+    b <span class="ot">&lt;-</span> dice <span class="dv">6</span>
+    return (a<span class="fu">+</span>b)</code></pre></div>
+<p>Cuando lo llamemos, tomará la distribución suma de las dos distribuciones de dados:</p>
+<pre class="example"><code>λ&gt; fst (runState (replicateM 100 twodices) 1032)
+
+[8,11,8,8,5,3,7,8,9,5,2,6,7,9,8,7,5,9,3,9,10,7,7,10,
+8,2,5,6,4,10,8,6,4,6,4,8,9,7,12,11,9,3,2,7,5,5,6,10,
+6,6,3,11,4,7,3,6,3,7,10,4,4,11,4,10,3,5,2,8,4,10,12,
+8,9,5,9,11,6,4,10,6,6,12,5,2,7,8,7,4,4,4,9,6,6,6,3,
+11,11,9,7,6]
+</code></pre>
+<h2 id="mónadas-en-teoría-de-categorías">Mónadas en teoría de categorías</h2>
+<p>Para entender cómo funcionan las <a href="https://es.wikipedia.org/wiki/M%C3%B3nada_(teor%C3%ADa_de_categor%C3%ADas)">mónadas</a> en teoría de categorías tenemos que entender dos conceptos: los <em>productos en una <a href="https://es.wikipedia.org/wiki/Categor%C3%ADa_monoidal">categoría monoidal</a></em> y <em>los endofuntores de una categoría</em>. La unión de ambos conceptos es lo que nos dará las mónadas como una construcción en teoría de categorías.</p>
+<h3 id="categorías-monoidales">Categorías monoidales</h3>
+<p>Simplificando, una categoría monoidal es aquella donde, dados dos objetos <span class="math inline">\(A,B\)</span>, tenemos un objeto /“producto tensor”/ de ambos, <span class="math inline">\(A \otimes B\)</span>, donde además existe un objeto identidad <span class="math inline">\(I\)</span> cumpliendo propiedades como:</p>
+<p><span class="math display">\[A \otimes B \cong B \otimes A\]</span></p>
+<p><span class="math display">\[A \otimes (B \otimes C) \cong (A \otimes B) \otimes C\]</span></p>
+<p><span class="math display">\[A \otimes I \cong A\]</span></p>
+<h3 id="ejemplos-de-categorías-monoidales">Ejemplos de categorías monoidales</h3>
+<p>Los <strong>conjuntos</strong> con el producto cartesiano y el conjunto de un elemento forman ya una categoría monoidal. Puede comprobarse sobre ellos que existen los isomorfismos:</p>
+<p><span class="math display">\[A \times B \cong B \times A\]</span></p>
+<p><span class="math display">\[A \times (B \times C) \cong (A \times B) \times C\]</span></p>
+<p><span class="math display">\[A \times \{\bullet\} \cong A\]</span></p>
+<p>Pero además, podemos darles <em>otra</em> estructura de categoría monoidal, esta vez con la <a href="https://es.wikipedia.org/wiki/Uni%C3%B3n_disjunta">unión disjunta</a> y el conjunto vacío:</p>
+<p><span class="math display">\[A \sqcup B \cong B \sqcup A\]</span></p>
+<p><span class="math display">\[A \sqcup (B \sqcup C) \cong (A \sqcup B) \sqcup C\]</span></p>
+<p><span class="math display">\[A \sqcup \varnothing \cong A\]</span></p>
+<p>En general, <strong>todas las categorías con productos finitos son categorías monoidales</strong> con el producto categórico y el objeto terminal como unidad. Todas las categorías con coproductos finitos son categorías monoidales con el coproducto categórico y el objeto inicial como unidad.</p>
+<p>Otro ejemplo distinto lo forman los <strong>espacios vectoriales</strong> sobre un cuerpo <span class="math inline">\(K\)</span> con el producto tensor y el propio cuerpo sirviendo como unidad; o los <strong>grupos abelianos</strong> con el producto tensor y <span class="math inline">\(\mathbb{Z}\)</span> siendo la unidad.</p>
+<h3 id="objetos-monoide">Objetos monoide</h3>
+<p>Un objeto <span class="math display">\[A\]</span> de una categoría monoidal es objeto monoide cuando puedo definir un morfismo desde el objeto identidad hacia él y un morfismo desde el producto tensor <span class="math display">\[A \otimes A\]</span> hacia él. Es decir, hay un morfismo <em>cero</em>:</p>
+<p><span class="math display">\[ I \overset{0}\longrightarrow A \]</span></p>
+<p>Y un morfismo <em>multiplicación</em>:</p>
+<p><span class="math display">\[ A \otimes A \overset{\mu}\longrightarrow A \]</span></p>
+<p>Cumpliendo ciertas propiedades similares a las que exigimos a un monoide. De hecho, un objeto monoide en la categoría de los conjuntos con el producto cartesiano es simplemente un <strong>monoide</strong> normal y corriente.</p>
+<h3 id="categorías-de-endofuntores">Categorías de endofuntores</h3>
+<p>El ejemplo que nos interesa ahora, sin embargo, es el de los <strong>endofuntores</strong> de una categoría. Un <strong>funtor</strong>, de forma simplificada, es una <em>aplicación entre categorías</em>; que lleva objetos en objetos y morfismos en morfismos, respetando además el punto de inicio y fin de cada morfismo.</p>
+<p>Si consideramos los funtores de una categoría a sí misma, tenemos los <strong>endofuntores</strong> de la categoría. Y entre ellos existen transformaciones naturales que actúan como morfismos en el sentido de que se componen para dar otras transformaciones naturales. Teniendo unos objetos (los endofuntores), y unos morfismos (las transformaciones naturales), tenemos una categoría. Nótese que hemos abstraído mucho, estamos trabajando con una categoría en la que cada objeto es en sí mismo un endofuntor y cada morfismo es toda una transformación natural entre dos funtores.</p>
+<p>Esta es además una categoría monoidal. El producto tensor de esta categoría monoidal será la composición <span class="math inline">\(\circ\)</span>, y el objeto identidad el endofuntor identidad, que actúa dejando fijo cada objeto y cada morfismo.</p>
+<h3 id="mónadas">Mónadas</h3>
+<p>Pues bien, una mónada es un objeto monoide en la categoría de los endofuntores con la composición como producto tensor. Esto quiere decir que es un endofuntor <span class="math display">\[F\]</span> con transformaciones naturales:</p>
+<p><span class="math display">\[F \circ F \Rightarrow F\]</span></p>
+<p><span class="math display">\[I \Rightarrow F\]</span></p>
+<p>Como una transformación natural nos da un morfismo por cada objeto en el que se aplica el funtor, lo que tenemos son familias de morfismos:</p>
+<p><span class="math display">\[F(F(X)) \overset{\mu_x}\longrightarrow F(X)\]</span></p>
+<p><span class="math display">\[X \overset{r_x}\longrightarrow F(X)\]</span></p>
+<h3 id="una-categoría-para-la-programación-funcional">Una categoría para la programación funcional</h3>
+<p>Algunos sistemas de tipos, con las funciones entre ellos <code>A -&gt; B</code> como morfismos, forman una categoría<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. No es el caso de Haskell, en el que, por varios motivos, sus tipos no forman una categoría<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>; pero las construcciones con inspiración en la teoría de categorías toman el nombre de sus homólogas.<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></p>
+<p>El primer ejemplo de esto son los <strong>funtores</strong>. En Haskell, un funtor se define como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span> 
+<span class="ot">  fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b </code></pre></div>
+<p>Es decir un funtor toma un tipo <code>a</code> (un objeto de la categoría), y nos devuelve otro tipo <code>f a</code> (otro objeto de la <em>misma</em> categoría). Por otro lado, el funtor toma un morfismo <code>a -&gt; b</code> y nos devuelve otro morfismo <code>f a -&gt; f b</code>. Es decir, los funtores de la programación funcional son <strong>endofuntores en la categoría de los tipos</strong>, siempre que conserven ciertas reglas que tienen su reflejo en las reglas de funtores en Haskell.</p>
+<h3 id="monoides-en-la-categoría-de-los-endofuntores">Monoides en la categoría de los endofuntores</h3>
+<p>Entonces, si los funtores <code>f :: * -&gt; *</code> son endofuntores en alguna categoría, tiene sentido cuestionarse cuáles de ellos son monoides. Esto, junto con ciertas restricciones que se le imponen como leyes a las mónadas, equivale a decir que existen los morfismos dados por las transformaciones naturales que pedíamos antes, es decir, deben existir morfismos de tipos <code>a -&gt; m a</code> y <code>m (m a) -&gt; m a</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">return<span class="ot"> ::</span> a <span class="ot">-&gt;</span> m a
+<span class="ot">join ::</span> m (m a) <span class="ot">-&gt;</span> m a</code></pre></div>
+<p>Así, a cualquier funtor que tiene estos dos morfismos, además del <code>fmap</code> que tenía por ser funtor, lo llamamos <strong>mónada</strong>. Nótese que <code>&gt;&gt;=</code> puede implementarse desde <code>join</code> y viceversa, como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">(&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+(<span class="fu">&gt;&gt;=</span>) x f <span class="fu">=</span> join (fmap f a)
+
+<span class="ot">join ::</span> m (m a) <span class="ot">-&gt;</span> m a
+join x <span class="fu">=</span> x <span class="fu">&gt;&gt;=</span> id</code></pre></div>
+<p>Tenemos entonces dos definiciones equivalentes de lo que es una mónada. Una desde la teoría de categorías y otra desde la teoría de tipos y los lenguajes de programación funcional. Una visión desde las mónadas como monoides en la categoría de los endofuntores desde dentro de Haskell puede verse <a href="http://blog.sigfpe.com/2008/11/from-monoids-to-monads.html">aquí</a>.</p>
+<h2 id="y-más">Y más</h2>
+<p>Además de las enunciadas en este post, existen más otros temas relevantes en relación a las mónadas, tanto en programación funcional como en teoría de categorías:</p>
+<ul>
+<li><a href="http://book.realworldhaskell.org/read/monad-transformers.html">Transformadores de mónadas</a>, usadas para componer mónadas.</li>
+<li><a href="http://stackoverflow.com/questions/8428554/what-is-the-comonad-typeclass-in-haskell">Comónadas</a>, la noción dual de una mónada.</li>
+<li><a href="https://en.wikipedia.org/wiki/Kleisli_category">Categorías de Kleisli</a>, cada mónada da lugar a una categoría de Kleisli.</li>
+<li><a href="https://en.wikipedia.org/wiki/Adjoint_functors">Funtores adjuntos</a>, cada par de funtores adjuntos da lugar a una mónada.</li>
+<li><a href="http://www.cs.tufts.edu/comp/150FP/archive/brent-yorgey/tc.pdf">Typeclassopedia</a>, una revisión de otras clases de tipos relevantes en Haskell y relacionadas con la teoría de categorías.</li>
+</ul>
+<h2 id="referencias">Referencias</h2>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Peligros de la notación do. <a href="https://wiki.haskell.org/Do_notation_considered_harmful">Do notation considered harmful</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Enumerando los racionales. <a href="http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/rationals.pdf">Enumerating the rationals - J. Gibbons, D. Lester, R. Bird</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>La correspondencia entre tipos, lógica y categorías. <a href="https://ncatlab.org/nlab/show/computational+trinitarianism">Computational Trinitarianism - NLab</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Por qué los tipos de Haskell no son una categoría. <a href="http://math.andrej.com/2016/08/06/hask-is-not-a-category/">Hask is not a category - Andrej Bauer</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Por qué en ocasiones puede ser útil pensar en ellos como una categoría. <a href="https://ro-che.info/articles/2016-08-07-hask-category">Does it matter if Hask is (not) a category?</a><a href="#fnref5">↩</a></p></li>
+</ol>
+</div>
+]]></summary>
+</entry>
+<entry>
+    <title>Distribuciones discretas con mónadas</title>
+    <link href="http://m42.github.io/blog/posts/2016-12-10-distribucionesmonadas.html" />
+    <id>http://m42.github.io/blog/posts/2016-12-10-distribucionesmonadas.html</id>
+    <published>2016-12-10T00:00:00Z</published>
+    <updated>2016-12-10T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on December 10, 2016
+    
+</div>
+
+<h2 id="el-modelo">El modelo</h2>
+<p>Como parte de una serie de ejemplos sobre uso de mónadas, he escrito un poco de código para modelar distribuciones discretas usando mónadas.</p>
+<p>Por un lado, usa un <a href="https://math.dartmouth.edu/archive/m20f11/public_html/RANDOMNESS_LCG.pdf">generador congruencial lineal</a> para generar números aleatorios; y por otro, usa la mónada <a href="https://wiki.haskell.org/State_Monad">State</a> para pasar una semilla aleatoria de una función a otra que me permita seguir generado números aleatorios.</p>
+<p>Por último, aporta un método que deriva <a href="http://www.zvon.org/other/haskell/Outputprelude/Show_c.html">Show</a> para probar las distribuciones y dibujar un histograma de cualquiera de ella.</p>
+<h2 id="componiendo-distribuciones">Componiendo distribuciones</h2>
+<p>Lo más útil de esta idea para mí ha sido el poder generar unas distribuciones a partir de otras. La primera que genero es un dado de <code>n</code> caras usando la semilla. Aquí es donde se implementa el generador congruencial:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">dice ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Distribution</span> <span class="dt">Int</span>
+dice n <span class="fu">=</span> state (\s <span class="ot">-&gt;</span> (s <span class="ot">`mod`</span> n <span class="fu">+</span> <span class="dv">1</span>, <span class="dv">16807</span><span class="fu">*</span>s <span class="ot">`mod`</span> <span class="dv">2147483647</span>))</code></pre></div>
+<p>Que funciona como una distribución uniforme:</p>
+<pre><code>&gt;&gt;&gt; dice 6
+
+1:	 ################
+2:	 ################
+3:	 ################
+4:	 ################
+5:	 ################
+6:	 ################
+</code></pre>
+<p>Pero desde ella puedo generar fácilmente otras usando funciones que compongan distribuciones. Un ejemplo es usar <code>(⊕) = liftM2 (+)</code> para sumar dados:</p>
+<pre><code>&gt;&gt;&gt; dice 6 ⊕ dice 6
+
+2:	 #####
+3:	 ##########
+4:	 ###############
+5:	 ####################
+6:	 ##########################
+7:	 ##############################
+8:	 #########################
+9:	 ####################
+10:	 ###############
+11:	 ##########
+12:	 #####
+</code></pre>
+<h2 id="otras-distribuciones">Otras distribuciones</h2>
+<p>Y puedo crear otras distribuciones similares a partir de ellas, como la distribución de <strong>Bernoulli</strong> y la <strong>Binomial</strong> usando funciones para composición de mónadas:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">bernoulli ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Distribution</span> <span class="dt">Int</span>
+bernoulli p <span class="fu">=</span> <span class="kw">do</span>
+  sample <span class="ot">&lt;-</span> dice <span class="dv">1000000</span>
+  <span class="kw">if</span> (fromIntegral sample <span class="fu">/</span> <span class="fl">1000000.0</span> <span class="fu">&lt;</span> p)
+    <span class="kw">then</span> return <span class="dv">1</span>
+    <span class="kw">else</span> return <span class="dv">0</span>
+
+<span class="ot">binomial ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Distribution</span> <span class="dt">Int</span>
+binomial k p <span class="fu">=</span> sum <span class="fu">&lt;$&gt;</span> replicateM k (bernoulli p)</code></pre></div>
+<p>Lo que me gusta de este código es que dejamos a la estructura de mónada encargarse internamente de el paso de la semilla de aleatoriedad y podemos componer distribuciones más simples para crear distribuciones más complejas.</p>
+<h2 id="el-código">El código</h2>
+<p>El código completo se presenta aquí. Es un pequeño código que dejé de ejemplo pero que seguramente pueda mejorarse bastante; lo dejo aquí como guión para esta idea:</p>
+<script src="https://gist.github.com/M42/7d9d2ecf174bad73804e67fd5cb8de72.js"></script>
+]]></summary>
+</entry>
+<entry>
+    <title>Wikipedia contributions</title>
+    <link href="http://m42.github.io/blog/posts/2016-10-29-wikipediacontributions.html" />
+    <id>http://m42.github.io/blog/posts/2016-10-29-wikipediacontributions.html</id>
+    <published>2016-10-29T00:00:00Z</published>
+    <updated>2016-10-29T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on October 29, 2016
+    
+</div>
+
+<p>The majority of my math-related contributions to Wikipedia are translations from the English language Wikipedia to the Spanish one:</p>
+<ul>
+<li><a href="https://es.wikipedia.org/wiki/Lema_de_escisi%25C3%25B3n">Lema de escisión</a></li>
+<li><a href="https://es.wikipedia.org/wiki/Compleci%25C3%25B3n_(%25C3%25A1lgebra)">Compleción (Álgebra)</a></li>
+<li><a href="https://es.wikipedia.org/wiki/Lema_de_la_serpiente">Lema de la serpiente</a></li>
+<li><a href="https://es.wikipedia.org/wiki/M%25C3%25B3nada_(teor%25C3%25ADa_de_categor%25C3%25ADas)">Mónada (teoría de categorías)</a></li>
+<li><a href="https://es.wikipedia.org/wiki/Funtor_Tor">Funtor Tor</a></li>
+<li><a href="https://es.wikipedia.org/wiki/M%25C3%25B3dulo_simple">Módulo simple</a></li>
+</ul>
+]]></summary>
+</entry>
+<entry>
+    <title>Matemáticas en Emacs</title>
+    <link href="http://m42.github.io/blog/posts/2016-09-26-matematicasemacs.html" />
+    <id>http://m42.github.io/blog/posts/2016-09-26-matematicasemacs.html</id>
+    <published>2016-09-26T00:00:00Z</published>
+    <updated>2016-09-26T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="info">
+    Posted on September 26, 2016
+    
+</div>
+
+<p><em>Actualizado a 06 de agosto de 2017.</em></p>
+<h2 id="apuntes-a-ordenador">Apuntes a ordenador</h2>
+<p>Tomar apuntes de matemáticas con el ordenador es una tarea difícil por lo complejo que es transcribir la notación (símbolos, letras en otros alfabetos, índices…) y la velocidad necesaria. Además, los diagramas, dibujos, flechas o anotaciones no textuales que tomamos parecen imposibles de transcribir fielmente a un fichero.</p>
+<p><strong><a href="https://www.latex-project.org/about/">Latex</a></strong> permite notación matemática pero no facilita la velocidad (al fin y al cabo, Latex estaría pensado para edición de libros, no para tomar apuntes). <strong><a href="https://daringfireball.net/projects/markdown/">Markdown</a></strong>, por otro lado, simplifica mucho el poder escribir, pero pierde mucha potencia respecto a Latex. Así que una solución es usar <strong><a href="http://orgmode.org/">org-mode</a></strong> como lenguaje de marcado; es relativamente simple y fácilmente legible, como markdown, mientras que permite visualización de latex conforme se edita, programación literaria y exportación a latex y html, permitiendo la inclusión de código latex o html arbitrario para exportarlo.</p>
+<h2 id="ventajas-de-org-mode">Ventajas de org-mode</h2>
+<p><strong>org-mode</strong> tiene internamente un lenguaje de marcado similar al de markdown, con la ventaja para el usuario de Emacs de que está adaptado especialmente al editor. Permite escribir fórmulas en Latex y exportar luego a <code>.tex</code> y <code>.pdf</code>, controlando las opciones de Latex.</p>
+<p>Una fórmula en Latex puede escribirse directamente en <strong>org-mode</strong> incluyéndola entre <span class="math inline">\(\mathtt{\backslash\left( \dots \backslash\right)}\)</span>, si está dentro de una línea de texto (como en <span class="math inline">\(i \ast x = x\)</span>); o entre <span class="math inline">\(\backslash[\ \dots\ \backslash]\)</span>, cuando queremos que se muestre aparte del texto como en el siguiente ejemplo</p>
+<p><span class="math display">\[ \sum_{n=0}^\infty \frac{1}{2^n}. \]</span></p>
+<p>Cuando terminamos de escribirla podemos <a href="http://orgmode.org/worg/org-tutorials/org-latex-preview.html">previsualizarla</a> directamente con <code>C-c C-x C-l</code>, como si fuera un editor <a href="https://es.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a>.</p>
+<p>Si vamos a acabar exportando a latex podemos insertar entornos como los que ofrece la biblioteca de la AMS con</p>
+<pre class="example"><code>#+begin_theorem
+[texto del teorema]
+#+end_theorem
+</code></pre>
+<p>o incluso definir nuestros propios entornos y usarlos después de la misma forma. Además, también permite la inclusión de bloques de código con</p>
+<pre class="example"><code>#+begin_src ruby
+[código en ruby]
+#+end_src
+</code></pre>
+<p>en la mayoría de lenguajes de programación y algunos especialmente útiles para matemáticas como <code>Sage</code>.</p>
+<h2 id="zoom">Zoom</h2>
+<p>Un problema menor (y quizá sólo mío) al configurar todo esto es que las fórmulas previsualizadas parecen demasiado pequeñas. Aunque estén en proporción con el texto, cuesta más leerlas; y cuando aumentamos el tamaño del texto con <code>C-x C-+</code>, las fórmulas no se amplían con él. Para conseguir que lo hagan hay que incluir el siguiente trozo de código en el archivo de configuración de Emacs, mezcla de dos respuestas de <a href="http://emacs.stackexchange.com/questions/3387/how-to-enlarge-latex-fragments-in-org-mode-at-the-same-time-as-the-buffer-text">thisirs y Mark</a> en Stack Overflow:</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">defun</span><span class="fu"> update-org-latex-fragment-scale </span>()
+  (<span class="kw">let</span> ((text-scale-factor
+         (<span class="kw">expt</span> text-scale-mode-step text-scale-mode-amount)))
+    (plist-put org-format-latex-options
+               :scale (<span class="op">*</span> <span class="fl">1.2</span> text-scale-factor)))
+)
+(add-hook
+ &#39;text-scale-mode-hook
+ &#39;update-org-latex-fragment-scale)</code></pre></div>
+<p>Después de volver a cargar el archivo de configuración, las fórmulas nuevas deberían volver a ajustarse con el texto.</p>
+<h2 id="aumentando-la-velocidad-de-escritura">Aumentando la velocidad de escritura</h2>
+<p>Mi objetivo principal con todo esto era escribir matemáticas más rápidamente, así que <a href="http://emacs.stackexchange.com/questions/26322/math-autocompletion-in-org-mode">pregunté sobre autocompletado</a> y concluí en usar <code>latex-math-mode</code>. Esto permite incluir comandos de Latex con atajos de teclado. En su configuración original usa el caracter <code>`</code> para acceder a ellos, así que <code>`-a</code> escribe <code>\alpha</code>. Yo he decidido cambiar el acento invertido, que ya cuesta dos pulsaciones en el teclado en español, por la <code>ç</code>, que no la suelo usar. Además de los que incluye el paquete por defecto, se pueden escribir atajos propios.</p>
+<p>Además de <code>latex-math-mode</code>, <code>cdlatex</code> es un modo de Emacs escrito por el mismo creador de org-mode, que facilita la escritura rápida de símbolos de latex. Puede añadirse a <code>org-mode</code> usando</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">use-package</span> cdlatex
+  :ensure <span class="kw">t</span>)
+
+(add-hook &#39;org-mode-hook &#39;turn-on-org-cdlatex)</code></pre></div>
+<p>y las instrucciones del paquete pueden encontrarse <a href="https://github.com/cdominik/cdlatex">aquí</a>.</p>
+<p>Por otro lado, empecé a usar <strong>yasnippets</strong> en Emacs. Son cómodos, fáciles de programar, y me permiten simplificar tareas como escribir diagramas conmutativos o complejos simpliciales en pocos pasos.</p>
+<h2 id="diagramas-conmutativos">Diagramas conmutativos</h2>
+<p>Ahora estoy escribiendo sobre álgebra homológica y teoría de categorías, así que la mayoría de lo que escribo usa secuencias exactas y diagramas conmutativos.</p>
+<p>Para las secuencias exactas, por ejemplo, tengo simplemente una plantilla con <code>yasnippet</code>, que me deja incluirlas escribiendo <code>complex_</code> y pulsando <code>&lt;tab&gt;</code>:</p>
+<pre class="example"><code># -*- mode: snippet -*-
+# name: complex
+# key: complex_
+#--
+\begin{aligned*} $1 \overset{$6}\longrightarrow 
+$2 \overset{$7}\longrightarrow 
+$3 \overset{$8}\longrightarrow 
+$4 \overset{$9}\longrightarrow 
+$5 \end{aligned*}
+</code></pre>
+<p>Para los diagramas conmutativos, la solución es un poco más compleja. El paquete <strong>tikz</strong> de Latex es muy útil para escribirlos pero tiene una sintaxis es demasiado recargada; así que existe <strong>tikz-cd</strong>, que simplifica esa sintaxis para centrarla en diagramas conmutativos. Para usarlo, hay que empezar por incluir en el archivo de configuración <code>init.el</code> las siguientes líneas</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(add-to-list
+  &#39;org-latex-packages-alist &#39;(<span class="st">&quot;&quot;</span> <span class="st">&quot;tikz&quot;</span> <span class="kw">t</span>))
+
+(eval-after-load <span class="st">&quot;preview&quot;</span>
+  &#39;(add-to-list
+    &#39;preview-default-preamble
+    <span class="st">&quot;</span>\\<span class="st">PreviewEnvironment{tikzpicture}&quot;</span>
+    <span class="kw">t</span>))</code></pre></div>
+<p>que pueden modificarse y escribirse de forma análoga si queremos que Emacs use internamente otros paquetes de Latex.</p>
+<p>Además en mi caso, tuve que cambiar el programa con el que generaba las imágenes. Parece funcionar sólo <strong>imagemagick</strong> cuando queremos usar diagramas conmutativos</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">setq</span> org-latex-create-formula-image-program &#39;imagemagick)</code></pre></div>
+<h2 id="cabeceras-en-latex">Cabeceras en Latex</h2>
+<p>Cuando necesitamos funcionalidad adicional que ofrece Latex en bibliotecas aparte, como usar <code>tikz-cd</code>, podemos incluirlas en la cabecera del archivo org como:</p>
+<pre><code>#+latex_header: \usepackage{amsthm}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{tikz-cd}
+</code></pre>
+<p>Además, si queremos que sea funcionalidad que sólo se use en la exportación de latex pero no en la previsualización, podemos incluirla con <code>#+latex_header_extra</code>.</p>
+<h2 id="archivos-de-configuración-de-org">Archivos de configuración de org</h2>
+<p>Para evitar tener que repetir varias veces la misma cabecera en varios archivos, podemos usar un sólo archivo para escribir matemáticas y fraccionarlo en secciones temáticas. Cuando necesitamos tratar una sección, podemos usar la funcionalidad de <em>narrowing</em> de <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html">org</a> para tratar sólo una sección.</p>
+<p>Otra opción es la de tener un sólo archivo de configuración <code>math.setup</code> con reglas de la forma</p>
+<pre><code>#+latex_header: \usepackage{amsthm}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{tikz-cd}
+</code></pre>
+<p>y cargarlo en cada archivo <code>org</code> con <code>#+SETUPFILE: math.setup</code>.</p>
+<h2 id="ejemplos">Ejemplos</h2>
+<p>Pueden encontrarse ejemplos de uso en <a href="https://github.com/m42/math">este repositorio</a> con mis apuntes de matemáticas. Mi archivo de configuración de Emacs está disponible en <a href="https://github.com/M42/.emacs.d">m42/emacs.d</a>.</p>
+]]></summary>
+</entry>
+
+</feed>
