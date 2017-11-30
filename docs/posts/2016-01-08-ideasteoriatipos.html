@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+        <title>Logoi - Ideas de teoría de tipos</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<link rel="stylesheet" href="../css/mathjax_fonts.css" />
+	<link rel="stylesheet" href="../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Logoi</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Posts</a>
+                <a href="../about.html">About</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Ideas de teoría de tipos</h1>
+            <div class="info">
+    Posted on January  8, 2016
+    
+</div>
+
+<p>Los sistemas de tipos tienen su utilidad en las matemáticas. Sirven para modelar una fundamentación de las matemáticas distinta de la usual fundamentación conjuntista; y tienen varias aplicaciones interesantes en lenguajes funcionales y asistentes de demostración. En particular, sobre los tipos se puede definir un álgebra y se pueden representar sistemas lógicos. Vamos a tratar esas aplicaciones referenciando en cada caso artículos donde se exponen en profundidad.</p>
+<h2 id="inducción-estructural">Inducción estructural</h2>
+<p>La inducción estructural es una generalización de la inducción usual sobre los naturales que la extiende a otras estructuras representables como tipos de un lenguaje funcional. Sobre la inducción estructural hemos escrito previamente en el blog una introducción:</p>
+<ul>
+<li><a href="http://tux.ugr.es/dgiim/blog/2015/03/14/induccion-estructural/">Inducción Estructural - Blog LibreIM</a></li>
+</ul>
+<p>En ese post se escriben ejemplos sobre los naturales y los árboles. El artículo sobre el que se basa es:</p>
+<ul>
+<li><a href="http://math.blogoverflow.com/2015/03/10/when-can-we-do-induction/">When can we do induction? - math.blogoverflow</a></li>
+</ul>
+<p>Ejemplos y más detalles sobre inducción estructural y sus usos pueden encontrarse en:</p>
+<ul>
+<li><a href="http://www.cs.cmu.edu/~me/212/handouts/structural.pdf">Some notes on Structural Induction - Michael Erdmann</a></li>
+<li><a href="http://arxiv.org/pdf/1312.2696.pdf">Structural Induction Principles for Functional Programmers - James Caldwell</a></li>
+</ul>
+<p>Y varias demostraciones por inducción estructural implementadas en Coq en este repositorio sobre <a href="https://github.com/M42/recorridosArboles"><strong>recorridos en árboles</strong></a>.</p>
+<h2 id="álgebra-de-tipos">Álgebra de tipos</h2>
+<p>En un post anterior del blog de <strong>LibreIM</strong> hemos tratado el álgebra de tipos. Ese post se basó sobre otros tres publicados en el blog de Chris Taylor:</p>
+<ul>
+<li><a href="http://tux.ugr.es/dgiim/blog/2015/03/24/algebra-tipos/">Álgebra de tipos - Blog LibreIM</a></li>
+<li><a href="http://chris-taylor.github.io/blog/2013/02/10/the-algebra-of-algebraic-data-types/">The algebra of algebraic data types, Part I - Chris Taylor</a></li>
+<li><a href="http://chris-taylor.github.io/blog/2013/02/11/the-algebra-of-algebraic-data-types-part-ii/">The algebra of algebraic data types, Part II - Chris Taylor</a></li>
+<li><a href="http://chris-taylor.github.io/blog/2013/02/13/the-algebra-of-algebraic-data-types-part-iii/">The algebra of algebraic data types, Part III - Chris Taylor</a></li>
+</ul>
+<p>En el segundo de los artículos se usan funciones generadoras para probar resultados sobre los números de Catalan y los árboles binarios. La teoría de funciones generadoras necesaria para entender el tratamiento de los árboles binarios la explica Mike Spivey en <em><a href="https://mikespivey.wordpress.com/2013/03/19/the-catalan-numbers-from-their-generating-function/">The catalan numbers from their generating function</a></em>.</p>
+<p>Además, existe un resultado de <strong>Fiore y Leinster</strong> que afirma que si demostramos una relacion polinómica para números complejos, también será válida para cualquier <a href="https://en.wikipedia.org/wiki/Semiring">semianillo</a>. Y por tanto, para los tipos. Esto quiere decir que, en la mayoría de las ocasiones, podemos usar la resta o la división de tipos como si existieran. La demostración excluye algunos casos particulares y se expone aquí:</p>
+<ul>
+<li><a href="http://arxiv.org/pdf/math/0212377v1.pdf">Objects of categories as complex numbers - Marcelo Fiore y Tom Leinster</a></li>
+</ul>
+<p>Sobre el uso de las derivadas en el álgebra de tipos existe un resultado de <strong>Conor McBride</strong> que relaciona las derivadas parciales con los <a href="http://learnyouahaskell.com/zippers"><em>zippers</em></a> de Haskell usados para representar contextos. Puede leerse aquí:</p>
+<ul>
+<li><a href="http://strictlypositive.org/diff.pdf">The derivative of a regular type is its type of one-hole contexts - Conor McBride</a>.</li>
+</ul>
+<h2 id="lógica-con-tipos">Lógica con tipos</h2>
+<p>La aplicación de los tipos a la lógica y las demostraciones parte del isomorfismo de Curry-Howard, que relaciona los sistemas de tipos con sistemas lógicos. El sistema más simple donde puede apreciarse el isomorfismo es el <a href="https://en.wikipedia.org/wiki/Typed_lambda_calculus"><strong>cálculo lambda tipado</strong></a>, que es isomorfo a la <a href="https://en.wikipedia.org/wiki/Natural_deduction"><strong>deducción natural</strong></a>. La deducción natural es un ejemplo de lógica intuicionista, lo que en la práctica quiere decir que <em>no</em> (!) se tienen el <em>tercio excluso</em> y la <em>doble negación</em> como axiomas:</p>
+<p><span class="math display">\[ A \vee \neg A\]</span></p>
+<p><span class="math display">\[ \neg \neg A \implies A \]</span></p>
+<p>Los apuntes sobre <a href="https://github.com/libreim/curryHoward/blob/master/CurryHoward.pdf"><strong>Curry-Howard</strong></a> de los repositorios del doble grado explican el isomorfismo sobre la deducción natural y el cálculo lambda tipado. El <a href="https://github.com/libreim/curryHoward/tree/master/src">código fuente</a> acompañando los apuntes está escrito en Coq y Haskell.</p>
+<p>La idea de tratar las proposiciones como tipos la expone <strong>Philip Wadler</strong> en los dos siguientes artículos: primero de manera didáctica, con una introducción histórica y sobre el sistema de la deducción natural, y luego de forma más compleja, exponiendo el isomorfismo sobre el sistema de tipos de Haskell.</p>
+<ul>
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/papers/propositions-as-types/propositions-as-types.pdf">Propositions as Types - Philip Wadler</a></li>
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/papers/gr2/gr2.pdf">The Girard-Reynolds Isomorphism - Philip Wadler</a></li>
+</ul>
+<h2 id="parametricidad">Parametricidad</h2>
+<p>La parametricidad limita las instancias posibles de los tipos de la forma <code>forall a. p(a)</code>, y nos permite obtener teoremas sobre todas las instancias de esos tipos. Se explica a nivel intuitivo en el siguiente post de Bartosz Milewski y más formalmente en este paper de Philip Wadler:</p>
+<ul>
+<li><a href="http://bartoszmilewski.com/2014/09/22/parametricity-money-for-nothing-and-theorems-for-free/">Parametricity: Money for Nothing and Theorems for Free - Bartosz Milewski</a></li>
+<li><a href="http://ttic.uchicago.edu/~dreyer/course/papers/wadler.pdf">Theorems for free! - Philip Wadler</a></li>
+</ul>
+<h2 id="teoría-de-tipos">Teoría de tipos</h2>
+<p>Los tipos pueden usarse para fundamentar las matemáticas, del mismo modo que lo hacen los conjuntos (en sistemas axiomáticos como <a href="https://en.wikipedia.org/wiki/Zermelo%E2%80%93Fraenkel_set_theory">ZFC</a>) o las categorías (en sistemas como <a href="https://ncatlab.org/nlab/show/ETCS">ETCS</a>). En el siguiente artículo se discuten las diferencias de ambos con la <strong>teoría de tipos dependientes de Martin-Löf</strong>, que se expone por completo en las notas de Nordström, Petersson y Smith:</p>
+<ul>
+<li><a href="https://golem.ph.utexas.edu/category/2013/01/from_set_theory_to_type_theory.html">From Set Theory to Type Theory - The n-Category Café</a></li>
+<li><a href="http://www.cse.chalmers.se/~bengt/papers/hlcs.pdf">Martin-Löf Type Theory - B. Nordström, K. Petersson, J.M. Smith</a></li>
+</ul>
+<p>Esto nos da una fundamentación de las matemáticas con una interpretación computacional clara.</p>
+<p>Una refinación de esas teorías para producir una fundamentación también constructivista de las matemáticas es el Cálculo de Construcciones (Calculus of constructions, COC) desarrollado por <strong>Thierry Coquand</strong> y <strong>Gérard Huet</strong>, que finalmente dará lugar al asistente de demostraciones <strong>COQ</strong>, desarrollado por el INRIA. El <a href="https://en.wikipedia.org/wiki/Lambda_cube"><strong><em>λ</em>-cubo</strong></a> es un diagrama para exponer cómo este sistema amplía al <em>cálculo lambda tipado</em> y al <em>Sistema</em> <span class="math inline">\(F_\omega\)</span> que (casi) usa Haskell.</p>
+<ul>
+<li><a href="http://ac.els-cdn.com/0890540188900053/1-s2.0-0890540188900053-main.pdf?_tid=3846e956-b301-11e5-8e78-00000aab0f02&amp;acdnat=1451925532_87ac5a8e6a7bd6477746a55c17130f43">Calculus of Constructions - T. Coquand, G. Huet</a>.</li>
+<li><a href="https://coq.inria.fr/">The Coq proof assistant - INRIA</a></li>
+</ul>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>;
+	    written with
+	    <a href="https://www.gnu.org/software/emacs/">Emacs</a> and
+	    <a href="http://orgmode.org/">org-mode</a>.
+        </div>
+    </body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+        <title>Logoi - Distribuciones discretas con mónadas</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<link rel="stylesheet" href="../css/mathjax_fonts.css" />
+	<link rel="stylesheet" href="../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Logoi</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Posts</a>
+                <a href="../about.html">About</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Distribuciones discretas con mónadas</h1>
+            <div class="info">
+    Posted on December 10, 2016
+    
+</div>
+
+<h2 id="el-modelo">El modelo</h2>
+<p>Como parte de una serie de ejemplos sobre uso de mónadas, he escrito un poco de código para modelar distribuciones discretas usando mónadas.</p>
+<p>Por un lado, usa un <a href="https://math.dartmouth.edu/archive/m20f11/public_html/RANDOMNESS_LCG.pdf">generador congruencial lineal</a> para generar números aleatorios; y por otro, usa la mónada <a href="https://wiki.haskell.org/State_Monad">State</a> para pasar una semilla aleatoria de una función a otra que me permita seguir generado números aleatorios.</p>
+<p>Por último, aporta un método que deriva <a href="http://www.zvon.org/other/haskell/Outputprelude/Show_c.html">Show</a> para probar las distribuciones y dibujar un histograma de cualquiera de ella.</p>
+<h2 id="componiendo-distribuciones">Componiendo distribuciones</h2>
+<p>Lo más útil de esta idea para mí ha sido el poder generar unas distribuciones a partir de otras. La primera que genero es un dado de <code>n</code> caras usando la semilla. Aquí es donde se implementa el generador congruencial:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">dice ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Distribution</span> <span class="dt">Int</span>
+dice n <span class="fu">=</span> state (\s <span class="ot">-&gt;</span> (s <span class="ot">`mod`</span> n <span class="fu">+</span> <span class="dv">1</span>, <span class="dv">16807</span><span class="fu">*</span>s <span class="ot">`mod`</span> <span class="dv">2147483647</span>))</code></pre></div>
+<p>Que funciona como una distribución uniforme:</p>
+<pre><code>&gt;&gt;&gt; dice 6
+
+1:	 ################
+2:	 ################
+3:	 ################
+4:	 ################
+5:	 ################
+6:	 ################
+</code></pre>
+<p>Pero desde ella puedo generar fácilmente otras usando funciones que compongan distribuciones. Un ejemplo es usar <code>(⊕) = liftM2 (+)</code> para sumar dados:</p>
+<pre><code>&gt;&gt;&gt; dice 6 ⊕ dice 6
+
+2:	 #####
+3:	 ##########
+4:	 ###############
+5:	 ####################
+6:	 ##########################
+7:	 ##############################
+8:	 #########################
+9:	 ####################
+10:	 ###############
+11:	 ##########
+12:	 #####
+</code></pre>
+<h2 id="otras-distribuciones">Otras distribuciones</h2>
+<p>Y puedo crear otras distribuciones similares a partir de ellas, como la distribución de <strong>Bernoulli</strong> y la <strong>Binomial</strong> usando funciones para composición de mónadas:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">bernoulli ::</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Distribution</span> <span class="dt">Int</span>
+bernoulli p <span class="fu">=</span> <span class="kw">do</span>
+  sample <span class="ot">&lt;-</span> dice <span class="dv">1000000</span>
+  <span class="kw">if</span> (fromIntegral sample <span class="fu">/</span> <span class="fl">1000000.0</span> <span class="fu">&lt;</span> p)
+    <span class="kw">then</span> return <span class="dv">1</span>
+    <span class="kw">else</span> return <span class="dv">0</span>
+
+<span class="ot">binomial ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Distribution</span> <span class="dt">Int</span>
+binomial k p <span class="fu">=</span> sum <span class="fu">&lt;$&gt;</span> replicateM k (bernoulli p)</code></pre></div>
+<p>Lo que me gusta de este código es que dejamos a la estructura de mónada encargarse internamente de el paso de la semilla de aleatoriedad y podemos componer distribuciones más simples para crear distribuciones más complejas.</p>
+<h2 id="el-código">El código</h2>
+<p>El código completo se presenta aquí. Es un pequeño código que dejé de ejemplo pero que seguramente pueda mejorarse bastante; lo dejo aquí como guión para esta idea:</p>
+<script src="https://gist.github.com/M42/7d9d2ecf174bad73804e67fd5cb8de72.js"></script>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>;
+	    written with
+	    <a href="https://www.gnu.org/software/emacs/">Emacs</a> and
+	    <a href="http://orgmode.org/">org-mode</a>.
+        </div>
+    </body>
+</html>

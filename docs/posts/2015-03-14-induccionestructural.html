@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+        <title>Logoi - Inducción estructural</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<link rel="stylesheet" href="../css/mathjax_fonts.css" />
+	<link rel="stylesheet" href="../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Logoi</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Posts</a>
+                <a href="../about.html">About</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Inducción estructural</h1>
+            <div class="info">
+    Posted on March 14, 2015
+    
+</div>
+
+<p>Normalmente aplicamos inducción sobre los números naturales, y cuando necesitamos aplicar inducción en otro contexto lo hacemos corresponder con los números naturales. Por ejemplo, si queremos demostrar una propiedad sobre los árboles binarios, la demostraríamos por inducción sobre la altura del árbol. Pero el proceso de llevar todo a los naturales puede ser incómodo, tedioso y puede complicar la demostración innecesariamente. En este post vamos a desarrollar una forma de ampliar la inducción a la estructura de los tipos de datos para simplificar todas esas demostraciones.</p>
+<h2 id="conjuntos-bien-fundados">Conjuntos bien fundados</h2>
+<p>Vamos a definir las relaciones bien fundadas, que nos permitirán definir una inducción generalizada. <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<ul>
+<li><strong>Relación bien fundada:</strong> una relación en un conjunto de elementos es bien fundada si todo subconjunto no vacío tiene un elemento minimal. Dado un orden parcial, es bien fundado si todo subconjunto no vacío tiene un elemento tal que ninguno es menor que él.</li>
+</ul>
+<p>Y podemos realizar inducción sobre cualquier conjunto con una relación bien fundada.</p>
+<ul>
+<li><p><strong>Inducción noetheriana:</strong> sea <span class="math inline">\(X\)</span> un conjunto bien fundado con <span class="math inline">\(A \subset X\)</span>. Si se cumple:</p>
+<p><span class="math display">\[ (y &lt; x \Rightarrow y \in A) \Rightarrow x \in A \]</span></p>
+<p>Entonces <span class="math inline">\(A = X\)</span>.</p></li>
+</ul>
+<h2 id="inducción-sobre-tipos">Inducción sobre tipos</h2>
+<p>Ahora vamos a aplicar esto a teoría de tipos. Sea un tipo con sus constructores. Para todas las instancias constructibles del tipo (es decir, aquellas que pueden generarse en un número finito de pasos desde sus constructores), definimos un orden parcial:</p>
+<ul>
+<li><strong>Orden constructivo:</strong> para dos instancias del tipo: <span class="math inline">\(a,b::A\)</span>, <span class="math inline">\(b\)</span> se construye con <span class="math inline">\(a\)</span> si el constructor de <span class="math inline">\(b\)</span> toma a <span class="math inline">\(a\)</span> como argumento. La clausura transitiva de esta relación forma un orden parcial: <span class="math display">\[ a \leq b \Rightarrow a \mbox{ se usa en la construcción de } b \]</span></li>
+</ul>
+<p>Y ahora tenemos una inducción sobre los constructores de los tipos, que describimos ahora.</p>
+<ul>
+<li><strong>Inducción sobre tipos</strong>: sea un tipo <span class="math inline">\(A\)</span> con constructores y sea <span class="math inline">\(P :: A \rightarrow Bool\)</span> una propiedad. Siendo <span class="math inline">\(a_1, a_2 \dots a_i :: A\)</span> argumentos del constructor, si se cumple la condición de inducción para cada constructor <span class="math inline">\(C_i\)</span>: <span class="math display">\[P(a_1) \wedge P(a_2) \wedge \dots P(a_i) \Rightarrow P(C_i(a_1,a_2,\dots,b_0,b_1\dots))\]</span></li>
+</ul>
+<p>Entonces <span class="math inline">\(a::A \Rightarrow P(a)\)</span></p>
+<h2 id="ejemplo-1-naturales">Ejemplo 1: Naturales</h2>
+<p>Nuestro primer ejemplo va a ser obtener la inducción sobre los naturales como caso particular. Damos una definición de los naturales en lenguaje Haskell, con los axiomas de Peano, un natural es 0 o el siguiente de un natural:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Nat</span> <span class="fu">=</span> <span class="dt">O</span>
+         <span class="fu">|</span> <span class="dt">S</span> <span class="dt">Nat</span></code></pre></div>
+<p>Que equivale a la definición en Coq:</p>
+<pre class="example"><code>Inductive nat : Type :=
+  | O : nat
+  | S : nat -&gt; nat
+</code></pre>
+<p>Es decir, si lo demostramos para <code>0</code> y para <code>S n</code> sabiéndolo para <code>n</code>, lo hemos demostrado para todos los naturales.</p>
+<h2 id="ejemplo-2-árboles-binarios">Ejemplo 2: Árboles binarios</h2>
+<p>Ahora vamos a intentar el ejemplo que motivó esta búsqueda. Definimos un árbol binario como un árbol vacío o como un nodo del que surgen dos árboles binarios, en Haskell:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Tree</span> a <span class="fu">=</span> <span class="dt">Empty</span>
+            <span class="fu">|</span> <span class="dt">Node</span> a (<span class="dt">Tree</span> a) (<span class="dt">Tree</span> a)</code></pre></div>
+<p>Que equivale a la definición en Coq:</p>
+<pre class="example"><code>Inductive tree (X:Type) : Type :=
+  | nilt : tree X
+  | node : X -&gt; tree X -&gt; tree X -&gt; tree X.
+</code></pre>
+<p>Es decir, si demostramos una propiedad para el árbol vacío y para un árbol sabiendo que la cumplen sus subárboles derecho e izquierdo, la hemos demostrado para todos los árboles binarios.</p>
+<p>En el repositorio <a href="https://github.com/M42/recorridosArboles">M42/recorridosArboles</a> hay varias demostraciones por inducción sobre árboles binarios, explicados en lenguaje natural y demostrados luego sobre el asistente de demostraciones Coq.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Post sobre generalizaciones de la inducción <a href="http://math.blogoverflow.com/2015/03/10/when-can-we-do-induction/">en Stack Overflow</a>.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>;
+	    written with
+	    <a href="https://www.gnu.org/software/emacs/">Emacs</a> and
+	    <a href="http://orgmode.org/">org-mode</a>.
+        </div>
+    </body>
+</html>

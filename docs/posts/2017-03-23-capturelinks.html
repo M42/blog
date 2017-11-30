@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+        <title>Logoi - Capturando links en org-mode</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<link rel="stylesheet" href="../css/mathjax_fonts.css" />
+	<link rel="stylesheet" href="../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Logoi</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Posts</a>
+                <a href="../about.html">About</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Capturando links en org-mode</h1>
+            <div class="info">
+    Posted on March 23, 2017
+    
+</div>
+
+<h2 id="capturando-links">Capturando links</h2>
+<p>El objetivo de este post es describir el proceso que uso para capturar links desde Firefox y almacenarlos en un archivo de org-mode, que puede leerse luego desde el propio navegador.</p>
+<h2 id="org-capture">Org-capture</h2>
+<p>La primera parte será activar <code>org-capture</code> y <code>org-protocol</code> en Emacs. <a href="https://www.gnu.org/software/emacs/manual/html_node/org/Capture.html#Capture">org-capture</a> puede ser usado también para escribir pequeñas ideas y almacenarlas en ficheros org rápidamente; pero, en este caso, lo usaremos sólo para recibir el link desde Firefox.</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">require</span> 'org-protocol)</code></pre></div>
+<p>Lo primero que debemos hacer es definir la plantilla que queremos usar para capturar los links. La sintaxis usada se explica en la <a href="https://www.gnu.org/software/emacs/manual/html_node/org/Template-expansion.html#Template-expansion">documentación</a> de org-mode, así como las opciones que usa después:</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(<span class="kw">setq</span> org-capture-templates
+  (<span class="kw">quote</span> (
+      (<span class="st">&quot;x&quot;</span> <span class="st">&quot;org-protocol&quot;</span> entry (file <span class="st">&quot;~/links.org&quot;</span>)
+       <span class="st">&quot;** %c %?&quot;</span> :kill-buffer <span class="kw">t</span> :prepend <span class="kw">t</span>))))</code></pre></div>
+<p>En este caso, guardará los links en un archivo llamado <code>links.org</code> en el directorio <code>home</code>. Pueden añadirse <a href="https://www.gnu.org/software/emacs/manual/html_node/org/Template-elements.html#Template-elements">opciones</a> para explicitar en qué punto exacto del archivo queremos insertar el link una vez lo capturemos.</p>
+<h2 id="extensión-de-firefox">Extensión de firefox</h2>
+<p>El uso de <code>org-protocol</code> desde Firefox puede gestionarse más detalladamente usando <a href="http://orgmode.org/worg/org-contrib/org-protocol.html#sec-4">marcadores</a> que activen la captura. En nuestro caso, como sólo necesitamos la configuración básica, podemos ahorrarnos este trabajo y dejárselo a la extensión <a href="http://chadok.info/firefox-org-capture/">org-capture for Firefox</a>.</p>
+<p>La extensión nos deja elegir en sus opciones si queremos que use una nueva ventana (me parece lo más conveniente y además veremos cómo controlarla luego con i3); la letra asignada a la plantilla (en nuestro caso hemos usado la <code>x</code> en la configuración anterior); y el atajo de teclado para activarla, que por defecto es <code>Ctrl-Alt-r</code>.</p>
+<p>Una vez activemos la extensión, podremos capturar enlaces pulsando el atajo.</p>
+<h2 id="cerrando-ventanas">Cerrando ventanas</h2>
+<p>Un problema menor al usar esta extensión es que crea ventanas de Emacs que no cierra al terminar. Otro problema es que suele crear también un buffer inicial al lado de nuestro buffer de captura. Podemos usar <strong>hooks</strong> para forzarlo a corregir ese comportamiento:</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(add-hook 'org-capture-mode-hook 'delete-other-windows)
+(add-hook 'org-capture-after-finalize-hook 'delete-frame)</code></pre></div>
+<h2 id="integrándolo-en-i3">Integrándolo en i3</h2>
+<p>Para los usuarios de i3, puede ser útil poder controlar dónde y cómo se crea la ventana de captura de Emacs. Un ejemplo de configuración es la siguiente, que coloca la ventana como flotante y en el centro de la pantalla; como si fuera un popup:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">for_window</span> [class=<span class="st">&quot;Emacs&quot;</span> title=<span class="st">&quot;CAPTURE&quot;</span>] floating enable
+<span class="ex">for_window</span> [class=<span class="st">&quot;Emacs&quot;</span> title=<span class="st">&quot;CAPTURE&quot;</span>] resize set 1880 480
+<span class="ex">for_window</span> [class=<span class="st">&quot;Emacs&quot;</span> title=<span class="st">&quot;CAPTURE&quot;</span>] move position center</code></pre></div>
+<h2 id="mostrando-los-links-en-el-navegador">Mostrando los links en el navegador</h2>
+<p>Para que además los links se muestren en el navegador, pueden usarse también <strong>hooks</strong> que se activen al guardado para exportar a HTML. En este post de <a href="https://rafaelleru.github.io/2017/01/22/to_read_list_emacs/"><span class="citation">@rafaelleru</span></a> se explica el proceso en detalle.</p>
+<h2 id="un-detalle-sin-solucionar">Un detalle sin solucionar</h2>
+<p>En la plantilla de captura, me gustaría poder usar además <code>%^g</code>, que crea un pequeño diálogo donde insertar tags al link que se está guardando. El problema con esto es que, hasta que ese diálogo no ha terminado, no se ejecutan los hooks y el frame no se hace único (ni se reposiciona en i3).</p>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>;
+	    written with
+	    <a href="https://www.gnu.org/software/emacs/">Emacs</a> and
+	    <a href="http://orgmode.org/">org-mode</a>.
+        </div>
+    </body>
+</html>

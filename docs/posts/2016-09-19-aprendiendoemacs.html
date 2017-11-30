@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+        <title>Logoi - Aprendiendo Emacs</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<link rel="stylesheet" href="../css/mathjax_fonts.css" />
+	<link rel="stylesheet" href="../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Logoi</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Posts</a>
+                <a href="../about.html">About</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Aprendiendo Emacs</h1>
+            <div class="info">
+    Posted on September 19, 2016
+    
+</div>
+
+<h2 id="emacs">Emacs</h2>
+<p><strong><a href="https://www.gnu.org/software/emacs/">Emacs</a></strong> es un editor de texto construido sobre un intérprete del lenguaje <strong><a href="https://es.wikipedia.org/wiki/Emacs_Lisp">Elisp</a></strong> para hacerlo extensible. Cada acción del editor constituye un comando sobre el intérprete, por lo que podemos reescribir sus comandos o crear nuevos comandos simplemente programando sobre el intérprete.</p>
+<p><img src="https://github.com/libreim/blog/raw/post-emacs/images/emacs.png" /> <em>Emacs editando este mismo artículo en Markdown</em></p>
+<p>Emacs sirve como IDE para la mayoría de lenguajes de programación y como editor para programación literaria y ciencia reproducible; se integra con git y con el sistema de archivos y tiene extensiones disponibles para usarse como aplicación para organizar listas de tareas, leer el correo o servir como hoja de cálculo.</p>
+<blockquote>
+<p>I use Emacs, which might be thought of as a thermonuclear word processor.</p>
+<p>– <strong>Neal Stephenson</strong>, <em>In the Beginning… was the command line.</em></p>
+</blockquote>
+<p>En este artículo haré una referencia breve a todo lo que me ha ido sirviendo para aprender Emacs mientras enlazo a fuentes que tratan cada uno de los temas más extensamente. Como recursos generales para aprender Emacs, puedo recomendar:</p>
+<ul>
+<li><a href="https://www.youtube.com/playlist?list=PLxj9UAX4Em-IiOfvF2Qs742LxEK4owSkr"><strong>.Emacs Tutorials</strong></a> de <em>jekor</em>, explican todo lo necesario para aprender Emacs en 10 videotutoriales que pueden seguirse progresivamente.</li>
+<li><a href="https://www.youtube.com/playlist?list=PL8tzorAO7s0he-pp7Y_JDl7-Kz2Qlr_Pj"><strong>Emacs Meetups</strong></a> de Thoughtbot, que profundizan sobre temas concretos de uso de Emacs.</li>
+<li><a href="http://emacsrocks.com/"><strong>Emacs Rocks</strong></a>, vídeos breves sobre casos concretos de uso de Emacs.</li>
+<li><a href="https://www.emacswiki.org/emacs/SiteMap"><strong>Emacs wiki</strong></a>, una wiki que documenta todo lo relacionado con Emacs.</li>
+<li><a href="http://sachachua.com/blog/category/geek/emacs/"><strong>sachachua.com</strong></a>, donde se hace referencia periódicamente a noticias de Emacs, y tiene escritas hojas de referencia de atajos de teclado de Emacs.</li>
+<li><a href="http://cestlaz.github.io/stories/emacs/"><strong>C’est la z</strong></a>, otro blog en el que se tratan temas relacionados con Emacs.</li>
+<li><a href="https://www.gnu.org/software/emacs/manual/"><strong>GNU Emacs</strong></a>, la documentación oficial de Emacs.</li>
+<li><a href="https://elbauldelprogramador.com/chuleta-atajos-teclado-emacs/"><strong>El baúl del programador</strong></a>, que ha empeazado una recopilación colaborativa de los comandos y paquetes más útiles para Emacs.</li>
+</ul>
+<!--more-->
+
+<h3 id="instalación">Instalación</h3>
+<p>Emacs puede encontrarse en la mayoría de gestores de paquetes, pero puede no estar en su versión más actualizada.</p>
+<pre class="example"><code>sudo apt install emacs
+</code></pre>
+<p>Para escribir este artículo estoy usando <code>GNU Emacs 25.1</code>, pero la última versión estable es la <strong>24.5</strong>. La versión estable actual puede descargarse desde <a href="https://www.gnu.org/software/emacs/">GNU</a>.</p>
+<h2 id="atajos-de-teclado">Atajos de teclado</h2>
+<p>En Emacs se usa una <a href="https://www.emacswiki.org/emacs/EmacsKeyNotation">notación específica</a> para escribir un atajos de teclado. La mayoría de documentación que consultes usará <code>C-x</code> en lugar de <code>Control+x</code>; usará <code>C-x C-s</code> para indicar que debes dejar pulsado <code>Control</code> mientras pulsas <code>x</code> y <code>s</code>; y por último, usará <code>M-x</code>, donde la <code>M</code> se referirá a la tecla <code>Meta</code>. La tecla <code>Meta</code> en Emacs se refiere normalmente a dos opciones equivalentes, o bien pulsar <code>alt izq.</code> mientras se pulsa <code>x</code>, o pulsar <code>Esc</code> y luego pulsar <code>x</code>. En resumen:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Atajo</th>
+<th>Descripción</th>
+<th>Comando</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>C-n</td>
+<td>Mantener control pulsado mientras se pulsa n</td>
+<td>Next line</td>
+</tr>
+<tr class="even">
+<td>C-x C-s</td>
+<td>Mantener control pulsado pulsando x y luego s</td>
+<td>Save file</td>
+</tr>
+<tr class="odd">
+<td>M-x</td>
+<td>Mantener alt o pulsar esc para luego pulsar x</td>
+<td>Execute Command</td>
+</tr>
+<tr class="even">
+<td>RET</td>
+<td>Salto de línea, pulsar enter antes de seguir</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Usar atajos de teclado facilita mucho usar Emacs rápidamente después del tiempo de aprendizaje. <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<p>Cuando abras el programa por primera vez, te ofrecerá seguir un tutorial de Emacs escrito en Emacs. El tutorial es muy útil para aprender a moverse dentro de Emacs, pero la mayoría de lo que cuenta no es especialmente fácil de aprender de una sola vez. Lo más chocante para un usuario nuevo puede ser el sistema de copiar-pegar; que de forma muy simplificada se resume en: <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<ul>
+<li><code>M-w</code> copia.</li>
+<li><code>C-w</code> corta.</li>
+<li><code>C-y</code> pega.</li>
+</ul>
+<p>Pero si no te convence, puedes usar <a href="https://www.emacswiki.org/emacs/CuaMode">CUA Mode</a>, que te permite volver a usar <code>C-c</code> y <code>C-v</code> para copiar y pegar. Otros comandos útiles de aprender antes de empezar con nada más son <code>C-x C-s</code> para guardar y <code>C-x C-f</code> para abrir un archivo.</p>
+<h3 id="documentación">Documentación</h3>
+<p>Emacs es un editor autodocumentado, es decir, la documentación del editor puede consultarse dentro del propio programa. Para llamar a la ayuda se puede pulsar <code>C-h ?</code>, que nos dejará elegir si necesitamos ayuda sobre comandos, atajos de teclados, variables, licencias, etc. Especialmente útiles son:</p>
+<ul>
+<li><code>C-h c &lt;atajo de teclado&gt;</code> nos da el nombre de la función que se ejecuta al pulsar esas teclas.</li>
+<li><code>C-h f &lt;nombre de función&gt;</code> documenta la función.</li>
+</ul>
+<h3 id="buffers-y-ventanas">Buffers y ventanas</h3>
+<p>Cada vez que abrimos un archivo, o pedimos un apartado de documentación, o abrimos la configuración, se abre un nuevo buffer. Un <a href="https://www.emacswiki.org/emacs/Buffer">buffer</a> es el equivalente a un documento o un espacio de trabajo en otros editores. Podemos movernos entre los buffers actualmente abiertos pulsando <code>C-x &lt;left&gt;</code> o <code>C-x &lt;right&gt;</code>; y podemos mostrar la lista de buffers actualmente abiertos con <code>C-x C-b</code> (¡en un nuevo buffer!).</p>
+<p>Además de los buffers que tengamos actualmente abiertos, tenemos ventanas que los muestran. Podemos partir la pantalla de Emacs en varias ventanas con <code>C-x 2</code> y <code>C-x 3</code>, que la parten horizontal y verticalmente respectivamente. Para volver a quedarnos sólo con la ventana en la que está el cursor, podemos pulsar <code>C-x 1</code>; y para cambiar de ventana sobre la que actúa el cursor podemos usar <code>C-x o</code>.</p>
+<h3 id="modos-de-emacs">Modos de Emacs</h3>
+<p>El comportamiento de Emacs sobre cada buffer que abra será distinto dependiendo normalmente de la extensión del archivo. Esto le permite colorear de manera distinta distintas sintaxis, o tener comportamientos específicos (indentación, atajos de teclado, formateo) cuando está editando cada lenguaje.</p>
+<p>Cada una de estas formas de edición se llama <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Major-Modes.html"><strong>modo</strong></a>, y el <strong>modo</strong> actual aparece resaltado entre paréntesis en la barra inferior de Emacs. El modo básico es <code>Fundamental</code>, pero para cada propósito existen modos específicos. Para casi todos los lenguajes de programación tendremos un modo. Existen, por ejemplo, <a href="https://www.emacswiki.org/emacs/RubyMode"><code>Ruby-mode</code></a>, <a href="https://www.emacswiki.org/emacs?action=browse;oldid=PythonMode;id=PythonProgrammingInEmacs#toc2"><code>Python-mode</code></a> o <a href="https://www.emacswiki.org/emacs/CcMode"><code>CC-mode</code></a>.</p>
+<p>Además de los <em>modos mayores</em> de los que hemos hablado hasta ahora, existen <em>modos menores</em> que son opcionales y complementan a los modos mayores. Por ejemplo, mientras escribo este artículo estoy usando <a href="https://www.emacswiki.org/emacs/MarkdownMode"><code>Markdown</code></a> como modo mayor y <code>ARev</code> (<a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Reverting.html">Auto-revert mode</a>) como modo menor.</p>
+<h2 id="personalización">Personalización</h2>
+<p>Prácticamente todos los parámetros que uses en Emacs pueden ser ajustados a tu necesidad. Desde los atajos de teclado hasta el tema de color y fuentes que usa el editor.</p>
+<p>La forma más básica de editar todas estas configuraciones es <code>M-x customize group</code>, que accede a un menú en el que se pueden modificar todas ellas. Todos los cambios que aquí se hagan se guardarán en un archivo <code>.emacs</code> (o <code>init.el</code>, en las versiones nuevas de Emacs). Este archivo es la otra forma de configurar Emacs; el archivo de inicio <code>.emacs</code> contiene código en Elisp que se ejecutará al iniciar el editor y podemos incluir allí todo lo que queramos configurar. Algunos paquetes, por ejemplo, necesitarán configuración adicional que habrá que incluir en este archivo.</p>
+<p><a href="https://youtu.be/mMcc0IF1hV0"><strong>.Emacs #2 - Customizations and themes</strong> - <em>jekor</em></a></p>
+<h2 id="sistemas-de-paquetes">Sistemas de paquetes</h2>
+<h3 id="melpa">Melpa</h3>
+<p>Es conveniente añadir un repositorio más grande que el que trae GNU por defecto, y <a href="https://melpa.org/#/">MELPA</a> es uno de los repositorios de paquetes de Emacs más grandes y actualizados. El repositorio de MELPA se añade desde <code>M-x customize-group RET package</code>. Dentro de la pestaña de repositorios puede insertarse la dirección de MELPA:</p>
+<pre class="example"><code>Archive name: melpa-stable
+URL or directory name: https://stable.melpa.org/packages/
+</code></pre>
+<p>Para salir de cualquiera de las pantallas de personalización se usa <code>q</code>.</p>
+<p>Otra forma de conseguir este mismo efecto es añadirlo directamente a nuestro archivo de configuración (<code>.emacs=/=init.el</code>), como se indica en las <a href="https://melpa.org/packages/">instrucciones de instalación</a> del repositorio.</p>
+<h3 id="paquetes">Paquetes</h3>
+<p>Podemos listar los paquetes que podemos instalar usado <code>M-x list-packages</code> y podemos buscar entre los paquetes pulsando varias veces el comando <code>C-s</code>. Si pulsamos <code>i</code> al lado de uno de ellos se marcará para instalar y al pulsar <code>x</code> se ejecutará la instalación de todos los paquetes marcados.</p>
+<p><a href="https://youtu.be/Cf6tRBPbWKs"><strong>.Emacs #3 - Installing packages and extensions</strong> - <em>jekor</em></a></p>
+<h2 id="paquetes-útiles">Paquetes útiles</h2>
+<h3 id="dired">Dired</h3>
+<p>Dired viene instalado por defecto con Emacs y permite navegar la estructura de directorios del sistema operativo. Podemos empezar a navegarla usando <code>M-x dired</code> y pulsando <code>RET</code> cada vez que queramos abrir un archivo o una carpeta.</p>
+<p>Podemos además afectar a los archivos. Por ejemplo, si queremos eliminar algunos archivos, podemos marcarlos con <code>d</code> y eliminarlos definitivamente con <code>x</code>.</p>
+<p><a href="https://youtu.be/7jZdul2fC94"><strong>.Emacs #4 - Exploring the filesystem</strong> - <em>jekor</em></a></p>
+<h3 id="org-mode">org-mode</h3>
+<p><strong>org-mode</strong> es un modo de Emacs que se creó originalmente para gestionar listas de tareas, agendas y calendarios; pero además, contiene en su interior un completo lenguaje de marcado. Permite exportar documentos a una gran variedad de formatos (pdf, html, latex o markdown) e incluir internamente trozos de código y ejecutarlos. Además, tiene un sistema de tablas en texto plano capaz de sustituir la hoja de cálculo para tareas sencillas. Por todo esto, puede ser usado en tareas como la ciencia reproducible o la programación literaria cuando Latex es demasiado complejo, ayudando además a manejar la bibliografía y los enlaces tanto externos como entre archivos.</p>
+<p><a href="https://youtu.be/SzA2YODtgK4"><strong>Getting started with org-mode</strong> - <em>Harry Schwartz</em></a></p>
+<p>Especialmente útil para matemáticas es la <a href="http://orgmode.org/worg/org-tutorials/org-latex-preview.html">previsualización de Latex</a> y el poder incluir los paquetes de la <a href="ftp://ftp.ams.org/pub/tex/doc/amsmath/amsldoc.pdf">AMS</a> para marcar teoremas o definiciones.</p>
+<p><img src="https://github.com/libreim/blog/raw/post-emacs/images/org-math.png" /> <em>Apuntes de matemáticas en org-mode</em></p>
+<h3 id="magit">magit</h3>
+<p><strong>magit</strong> permite integrar Emacs con <strong>git</strong> fácilmente para incluir los commits desde dentro del mismo editor. Usando <code>magit-status</code> llegamos a una pantalla en la que podemos elegir qué ficheros añadir al commit con <code>s</code> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> y visualizar las diferencias con el commit anterior usando <code>tab</code>; ejecutar el commit con <code>c c</code>, que nos mostrará el buffer con el mensaje de commit y por último usar <code>C-c C-c</code> para enviarlo. El push y pull los haremos desde <code>magit-status</code> con <code>P u</code> y <code>F u</code>, respectivamente.</p>
+<p>Es útil asignar un atajo de teclado al comando <code>magit-status</code>, que es el que muestra la ventana desde la que controlamos el añadir y hacer commit de ficheros. Por ejemplo, podemos fijarlo en <code>f5</code> añadiendo a nuestro archivo de configuración:</p>
+<div class="sourceCode"><pre class="sourceCode commonlisp"><code class="sourceCode commonlisp">(global-set-key (kbd <span class="st">&quot;&lt;f5&gt;&quot;</span>) 'magit-status)</code></pre></div>
+<h2 id="macros-de-teclado">Macros de teclado</h2>
+<p>Las macros de teclado nos dejan grabar una secuencia de acciones y volver a repetirla tantas veces como sea necesaria. Se puede empezar a grabar con <code>f3</code> y terminar la grabación y repetirla tantas veces como sea necesario con <code>f4</code>.</p>
+<p><a href="https://youtu.be/JfZ9fCHzkJw"><strong>.Emacs #9 - Keyboard macros</strong> - <em>jekor</em></a></p>
+<h2 id="elisp">Elisp</h2>
+<p><a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/">Emacs Lisp</a>, o Elisp, es un lenguaje de programación diseñado específicamente para escribir un editor de texto. Facilita el tratamiento de texto y el manejo de archivos y buffers.</p>
+<p>Podemos escribir scripts en Elisp que se encarguen de tareas repetitivas en nuestro editor de texto y asignarlas a atajos de teclado o ampliarlo con más funcionalidad. Un tutorial básico sobre Elisp es <a href="http://emacs-doctor.com/learn-emacs-lisp-in-15-minutes.html">Learn Emacs Lisp in 15 minutes</a>.</p>
+<h2 id="notas">Notas</h2>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Realmente solo puedo decir que a mí me funciona y que en general los atajos de teclado parecen ser <a href="http://ux.stackexchange.com/a/30749">mejores que usar el ratón</a>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>El <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Killing.html#Killing">sistema</a> que Emacs usa para esto es bastante más sofisticado.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>De hecho, podemos seleccionar qué párrafos dentro de un fichero queremos añadir al commit.<a href="#fnref3">↩</a></p></li>
+</ol>
+</div>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>;
+	    written with
+	    <a href="https://www.gnu.org/software/emacs/">Emacs</a> and
+	    <a href="http://orgmode.org/">org-mode</a>.
+        </div>
+    </body>
+</html>

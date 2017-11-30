@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+        <title>Logoi - Mónadas</title>
+        <link rel="stylesheet" href="../css/default.css" />
+	<link rel="stylesheet" href="../css/mathjax_fonts.css" />
+	<link rel="stylesheet" href="../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Logoi</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Posts</a>
+                <a href="../about.html">About</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Mónadas</h1>
+            <div class="info">
+    Posted on December 24, 2016
+    
+</div>
+
+<blockquote>
+<p>A monad is just a monoid in the category of endofunctors, what’s the problem?</p>
+<p>– <strong>Philip Walder</strong> (apócrifa) en <em><a href="http://james-iry.blogspot.com.es/2009/05/brief-incomplete-and-mostly-wrong.html">A Brief, Incomplete, and Mostly Wrong History of programming languages</a></em></p>
+</blockquote>
+<h2 id="prerrequisitos">Prerrequisitos</h2>
+<p>Este artículo requiere un conocimiento previo de Haskell, o al menos, de otro lenguaje de programación funcional. Puedes consultar nuestra <a href="http://tux.ugr.es/dgiim/blog/2014/10/01/intro-haskell/">introducción a Haskell</a> con recursos para iniciarte en el lenguaje.</p>
+<p>Por otro lado, para la segunda parte del artículo es recomendable conocimiento previo sobre teoría de categorías. Aun así, no es necesaria para leer la primera parte del artículo, donde hablamos de mónadas sin hacer ninguna referencia explícita a la teoría de categorías. Si quieres leer sobre ese tema, puedes consultar nuestros apuntes de <a href="http://tux.ugr.es/dgiim/blog/2014/10/04/intro-categorias/">introducción a teoría de categorías</a>.</p>
+<h2 id="motivación-para-las-mónadas">Motivación para las mónadas</h2>
+<h3 id="mónadas-en-haskell">Mónadas en Haskell</h3>
+<p>Imaginemos que necesitamos controlar cuando una función interna devuelve un error, o cuando usa un estado que debe ser pasado al resto de funciones. Cuando trabajamos con programación funcional pura, debemos devolver explícitamente el error (señalar cómo va a tratarlo cada función) o pasar el estado como argumento a cada una de las funciones; así que una solución sería modificar cada una de las funciones que usamos para que tenga en cuenta ese estado o ese caso de error, pero esto añadiría mucha complejidad innecesaria a nuestro código. La estructura de mónada simplifica esta escritura.</p>
+<p>El siguiente ejemplo, en el que tratamos el manejo de errores encapsulado en una mónada, está inspirado en los ejemplos de:</p>
+<ul>
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/papers/marktoberdorf/baastad.pdf">Monads for functional programming</a> - <em>Philip Wadler</em></li>
+</ul>
+<p>Que es una muy buena introducción al uso de las mónadas en programación funcional.</p>
+<h3 id="calculando-raíces-cuadradas">Calculando raíces cuadradas</h3>
+<p>Por ejemplo, supongamos que intentamos sacar raíces cuadradas en los reales usando el <a href="https://en.wikipedia.org/wiki/Integer_square_root#Algorithm">método de Newton</a>. Si intentamos calcular <span class="math inline">\(\sqrt{n}\)</span>, podemos tomar a cada paso la aproximación:</p>
+<p><span class="math display">\[ x_{k+1} = \frac{1}{2}\left( x_k+\frac{n}{x_k} \right) \]</span></p>
+<p>Y parar cuando estemos suficientemente cerca (más cerca que un ε dado):</p>
+<p><span class="math display">\[ |x_{k+1} - x_k| &lt; \varepsilon \]</span></p>
+<p>Escribimos una implementación de ese concepto de convergencia para listas infinitas en Haskell y del método de Newton, basado en la función <a href="http://hackage.haskell.org/package/base-4.9.0.0/docs/Prelude.html#v:iterate"><code>iterate</code></a>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">limit ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> [<span class="dt">Float</span>] <span class="ot">-&gt;</span> <span class="dt">Float</span>
+limit epsilon (x<span class="fu">:</span>y<span class="fu">:</span>xs)
+  <span class="fu">|</span> abs (x<span class="fu">-</span>y) <span class="fu">&lt;</span> epsilon <span class="fu">=</span> y
+  <span class="fu">|</span> otherwise           <span class="fu">=</span> limit epsilon (y<span class="fu">:</span>xs)
+
+<span class="ot">newtonaprox ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span>
+newtonaprox n x <span class="fu">=</span> (x <span class="fu">+</span> n<span class="fu">/</span>x)<span class="fu">/</span><span class="dv">2</span>
+
+<span class="ot">sqroot ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Float</span>
+sqroot <span class="dv">0</span> <span class="fu">=</span> <span class="dv">0</span>
+sqroot x <span class="fu">=</span> limit <span class="fl">0.03</span> (iterate (newtonaprox x) x)</code></pre></div>
+<p>Ahora imaginemos que usamos esta raíz cuadrada recién definida para solucionar una ecuación de segundo grado <span class="math inline">\(x^2 + bx + c = 0\)</span>:</p>
+<p><span class="math display">\[ x = \frac{-b \pm \sqrt{b^2 - 4c}}{2} \]</span></p>
+<p>Podemos definir una estructura de datos <code>QPol</code> para el polinomio y una función que lo resuelva obteniendo sus dos raíces:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">QPol</span> <span class="fu">=</span> <span class="dt">QPol</span> <span class="dt">Float</span> <span class="dt">Float</span> <span class="dt">Float</span>
+
+<span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">QPol</span> <span class="kw">where</span>
+    show (<span class="dt">Qpol</span> a b c) <span class="fu">=</span> show a <span class="fu">++</span> <span class="st">&quot;x² + &quot;</span> <span class="fu">++</span> show b <span class="fu">++</span> <span class="st">&quot;x + &quot;</span> show c
+
+<span class="ot">solve ::</span> <span class="dt">QPol</span> <span class="ot">-&gt;</span> (<span class="dt">Float</span>,<span class="dt">Float</span>)
+solve (<span class="dt">QPol</span> a b c) <span class="fu">=</span> (sol1 sol2)
+    <span class="kw">where</span> sol1 <span class="fu">=</span> ((<span class="fu">-</span>b) <span class="fu">+</span> sqroot(b<span class="fu">*</span>b<span class="fu">-</span><span class="dv">4</span><span class="fu">*</span>c<span class="fu">*</span>a))<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a)
+          sol2 <span class="fu">=</span> ((<span class="fu">-</span>b) <span class="fu">-</span> sqroot(b<span class="fu">*</span>b<span class="fu">-</span><span class="dv">4</span><span class="fu">*</span>c<span class="fu">*</span>a))<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a)</code></pre></div>
+<p>Y podemos comprobar que funciona:</p>
+<pre class="example"><code>λ&gt; pol = QPol 1 (-5) 6
+λ&gt; putStrLn $ &quot;Las soluciones de &quot; ++ show pol ++ &quot; son &quot; ++ solve pol
+Las soluciones de 1.0x² + -5.0x + 6.0 son (3.0,2.0)
+</code></pre>
+<h3 id="controlando-los-errores">Controlando los errores</h3>
+<p>Pero ¿qué ocurre cuando intentamos calcular la raíz cuadrada de un número no positivo? Este método no la encuentra, por lo que debería devolver un error antes de intentar empezar a calcularla. La solución obvia es reflejar este error con un <code>Maybe</code> en el cálculo de la raíz cuadrada.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">sqroot' ::</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span>
+sqroot' x
+  <span class="fu">|</span> x <span class="fu">&lt;</span> <span class="dv">0</span>     <span class="fu">=</span> <span class="dt">Nothing</span>
+  <span class="fu">|</span> x <span class="fu">==</span> <span class="dv">0</span>    <span class="fu">=</span> <span class="dt">Just</span> <span class="fl">0.0</span>
+  <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="dt">Just</span> ( limit <span class="fl">0.03</span> (iterate (newtonsqrt x) x) )</code></pre></div>
+<p>Esto lo soluciona, pero nos crea un problema mayor. La función <code>solve</code> está usando la raíz cuadrada y se espera de ella que devuelva un número, no un posible error. Si queremos conseguir que funcione con la nueva =sqroot’=, necesitaríamos implementar todas sus componentes internas teniendo en cuenta ese error. Por ejemplo, deberíamos reescribir el <code>(+)</code>, para tener en cuenta errores y propagarlos por todos los cálculos involucrando a =sqroot’=:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">(+.) ::</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span>
+(<span class="fu">+.</span>) <span class="dt">Nothing</span> _ <span class="fu">=</span> <span class="dt">Nothing</span>
+(<span class="fu">+.</span>) _ <span class="dt">Nothing</span> <span class="fu">=</span> <span class="dt">Nothing</span>
+(<span class="fu">+.</span>) (<span class="dt">Just</span> a) (<span class="dt">Just</span> b) <span class="fu">=</span> <span class="dt">Just</span> (a <span class="fu">+</span> b)</code></pre></div>
+<p>Pero esto es muy pesado de implementar; deberíamos implementarlo ¡para cada una de las operaciones que usen la raíz cuadrada en algún punto! Esto obliga a cada una de nuestras operaciones intermedias a ser conscientes de la posibilidad de error, dándonos código mucho menos modular y reusable.</p>
+<p>Una solución ligeramente mejor es la de abstraer este proceso de hacer a una función consciente de la posibilidad de error en una función aparte y definir las demás en función suya:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">errorAware ::</span> (a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b <span class="ot">-&gt;</span> <span class="dt">Maybe</span> c
+errorAware op <span class="dt">Nothing</span> _ <span class="fu">=</span> <span class="dt">Nothing</span>
+errorAware op _ <span class="dt">Nothing</span> <span class="fu">=</span> <span class="dt">Nothing</span>
+errorAware op (<span class="dt">Just</span> a) (<span class="dt">Just</span> b) <span class="fu">=</span> <span class="dt">Just</span> (op a b)
+
+(<span class="fu">+.</span>),<span class="ot"> (*.) ::</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> <span class="dt">Float</span>
+(<span class="fu">+.</span>) <span class="fu">=</span> errorAware (<span class="fu">+</span>)
+(<span class="fu">*.</span>) <span class="fu">=</span> errorAware (<span class="fu">*</span>)</code></pre></div>
+<p>Esto nos permite hacer cálculos con ellas:</p>
+<pre class="example"><code>λ&gt; sqroot' (-3) +. Just 4
+Nothing
+λ&gt; sqroot' 3 +. Just 4
+Just 5.732143
+</code></pre>
+<h3 id="la-mónada-maybe">La mónada Maybe</h3>
+<p>Esta idea para simplificar el tratamiento de errores, realizada correctamente, es lo que nos va a proporcionar la estructura de mónada. En Haskell, podemos definir una mónada como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Monad</span> m <span class="kw">where</span>
+<span class="ot">  (&gt;&gt;=)  ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+<span class="ot">  return ::</span> a <span class="ot">-&gt;</span> m a</code></pre></div>
+<p>La idea intuitiva es que <code>(&gt;&gt;</code>)= nos permite tomar una función que puede devolver errores pero que no comprueba a la entrada si ha recibido un error, es decir, de tipo <code>(a -&gt; Maybe b)</code> ; y aplicarla sobre una función que puede contener un error. La podríamos usar por ejemplo para componer varias <code>sqroot</code>’, que era algo que hasta ahora no podíamos hacer sin tratar cada posible caso de error. Y la función <code>return</code>, que en este caso es simplemente <code>Just</code>, nos permite considerar una constante como un posible error. Podemos calcular fácilmente así <span class="math display">\[\sqrt{\sqrt{3}}\]</span> teniendo en cuenta los casos de error:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">sqroot' (sqroot' <span class="dv">3</span>)              <span class="co">-- ¡Error de tipos!</span>
+sqroot' <span class="dv">3</span> <span class="fu">&gt;&gt;=</span> sqroot'            <span class="co">-- Usando mónadas</span>
+<span class="dt">Just</span>   <span class="dv">3</span> <span class="fu">&gt;&gt;=</span> sqroot' <span class="fu">&gt;&gt;=</span> sqroot' <span class="co">-- Usando Just</span>
+return <span class="dv">3</span> <span class="fu">&gt;&gt;=</span> sqroot' <span class="fu">&gt;&gt;=</span> sqroot' <span class="co">-- Equivalente a lo anterior</span></code></pre></div>
+<h3 id="notación-do">Notación do</h3>
+<p>Las mónadas definen las funciones anteriores y muchas más que no vamos a tratar ahora mismo, pero como resultado, nos acaban ofreciendo la <strong><a href="https://en.wikibooks.org/wiki/Haskell/do_notation">notación do</a></strong>, que es la que podemos usar para acabar escribiendo nuestra función <code>solve</code> como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">solve ::</span> <span class="dt">QPol</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">Float</span>,<span class="dt">Float</span>)
+solve (<span class="dt">QPol</span> a b c) <span class="fu">=</span> <span class="kw">do</span>
+  discriminant <span class="ot">&lt;-</span> sqroot' (b<span class="fu">*</span>b <span class="fu">-</span> <span class="dv">4</span><span class="fu">*</span>c<span class="fu">*</span>a)
+  return (((<span class="fu">-</span>b) <span class="fu">+</span> discriminant)<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a), ((<span class="fu">-</span>b) <span class="fu">-</span> discriminant)<span class="fu">/</span>(<span class="dv">2</span><span class="fu">*</span>a))</code></pre></div>
+<p>En la primera línea tenemos en cuenta que la función <code>sqroot</code> puede producir error, y en la segunda simplemente usamos el <em>posible</em> resultado de ella sin tener que preocuparnos por el resto de funciones.</p>
+<p>Nótese que la notación <strong>do</strong> es sólo una notación diseñada para aliviar la escritura de operaciones con mónadas en algunos casos particulares; es sólo <em>azúcar sintáctico</em> para operaciones que no dejan de ser puramente funcionales. Existen críticas al uso de esta notación. <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<h2 id="mónadas-en-programación-funcional">Mónadas en programación funcional</h2>
+<h3 id="mónadas-como-clase-de-tipos">Mónadas como clase de tipos</h3>
+<p>Las mónadas en Haskell están definidas como una clase de tipos teniendo:</p>
+<ul>
+<li>Un <strong>constructor</strong> de tipos <code>m ∷ * -&gt; *</code>, que para cada tipo <code>a</code>, devuelve una mónada conteniéndolo, <code>m a</code>.</li>
+<li>Una <strong>función</strong> <code>return ∷ a -&gt; m a</code>, que para todo elemento de tipo <code>a</code>, devuelve una mónada que lo contiene.</li>
+<li>Una <strong>función</strong> <code>(&gt;&gt;=) ∷ m a -&gt; (a -&gt; m b) -&gt; m b</code>, que dada una mónada y una función que se aplique sobre su interior y devuelva otra mónada, devuelve la mónada resultante. Sirve como composición de funciones monádicas.</li>
+</ul>
+<p>La existencia de la última función equivale a la existencia de otras dos funciones <code>fmap ∷ (a -&gt; b) -&gt; m a -&gt; m b</code> y <code>join ∷ m (m a) -&gt; m a</code>.</p>
+<p>Nótese entonces que para ser mónada, una clase de tipos debe ser primero un funtor. Dentro de los funtores que conocemos, podemos reconocer algunas mónadas, incluyendo la mónada <code>Maybe</code> que hemos usado hasta ahora:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Return de la mónada Maybe</span>
+return x <span class="fu">=</span> <span class="dt">Just</span> x
+
+<span class="co">-- Bind de la mónada Maybe</span>
+(<span class="dt">Just</span> x) <span class="fu">&gt;&gt;=</span> k <span class="fu">=</span> k x
+<span class="dt">Nothing</span>  <span class="fu">&gt;&gt;=</span> _ <span class="fu">=</span> <span class="dt">Nothing</span>
+
+<span class="co">-- Return de la mónada List</span>
+return x <span class="fu">=</span> [x]
+
+<span class="co">-- Bind de la mónada List</span>
+xs <span class="fu">&gt;&gt;=</span> f <span class="fu">=</span> [y <span class="fu">|</span> x <span class="ot">&lt;-</span> xs, y <span class="ot">&lt;-</span> f x]</code></pre></div>
+<p>Puedes empezar a leer tutoriales sobre el uso de las mónadas en Haskell en:</p>
+<ul>
+<li><a href="http://learnyouahaskell.com/a-fistful-of-monads">A fistful of monads - Learn you a Haskell</a></li>
+<li><a href="https://en.wikibooks.org/wiki/Haskell/Understanding_monads">Understanding monads - Wikibooks</a></li>
+</ul>
+<h3 id="mónada-lista">Mónada lista</h3>
+<p>En las listas, por ejemplo, tenemos como candidato para <code>join :: [[a]] -&gt; [a]</code> la concatenación de listas, <code>concat</code>. Nuestro <code>return :: a -&gt; [a]</code> será simplemente incluir un elemento en una lista que sólo lo contenga a él.</p>
+<p>En esta mónada, <code>(&gt;&gt;</code>)= mapea una función <code>a -&gt; [a]</code> sobre cada elemento de la lista y concatena todos los resultados:</p>
+<pre class="example"><code>λ&gt; [1,2,3] &gt;&gt;= (replicate 3)
+[1,1,1,2,2,2,3,3,3]
+</code></pre>
+<p>Nótese que, de la misma manera en la que podemos usar <code>(&gt;&gt;</code>)=, podemos usar una versión con sus parámetros cambiados de orden, <code>(=&lt;&lt;)</code>. Aquí usamos la mónada lista para enumerar los racionales repitiendo elementos:<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.List</span>
+<span class="kw">import </span><span class="dt">Data.Ratio</span>
+
+<span class="co">-- Crea los racionales con denominador n</span>
+<span class="ot">withDenom ::</span> <span class="dt">Integral</span> <span class="ot">-&gt;</span> [<span class="dt">Rational</span>]
+withDenom n <span class="fu">=</span> map (<span class="fu">%</span>n) [<span class="dv">1</span><span class="fu">..</span>]
+
+<span class="co">-- Para cada entero, crea los racionales que lo</span>
+<span class="co">-- tienen como denominador</span>
+<span class="ot">rationalsDup ::</span> [<span class="dt">Rational</span>]
+rationalsDup <span class="fu">=</span> withDenom <span class="fu">=&lt;&lt;</span> [<span class="dv">1</span><span class="fu">..</span>]
+
+<span class="co">-- Evita duplicados con 'nub'</span>
+<span class="ot">rationals ::</span> [<span class="dt">Rational</span>]
+rationals <span class="fu">=</span> nub rationalsDup</code></pre></div>
+<h3 id="mónada-io">Mónada IO</h3>
+<p>La mónada IO surge como una solución al problema de implementar efectos secundarios (como la lectura o escritura) en un lenguaje puro y de forma extensible, sin tener que alterar el sistema de tipos y respetando el orden en el que queremos que se ejecuten.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">greeting ::</span> <span class="dt">IO</span> ()
+greeting <span class="fu">=</span> fmap (<span class="st">&quot;Hola, &quot;</span><span class="fu">++</span>) getLine <span class="fu">&gt;&gt;=</span> print</code></pre></div>
+<p>Pueden leerse más detalles sobre mónada IO y su implementación en:</p>
+<ul>
+<li><a href="http://chris-taylor.github.io/blog/2013/02/09/io-is-not-a-side-effect/">IO is pure</a> - Chris Taylor</li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/1993/01/imperative.pdf">Imperative functional programming</a> - Simon L. Peyton Jones, Philip Wadler</li>
+<li><a href="https://blog.jle.im/entry/first-class-statements">First-Class “Statements”</a> - Justin Le</li>
+</ul>
+<h3 id="mónada-estado">Mónada estado</h3>
+<p>En ocasiones necesitamos que nuestras funciones conserven un estado además de realizar sus operaciones. Para esos casos existe la mónada estado <code>State s</code>, que guarda un valor de estado de tipo <code>s</code>. Podemos pensar en <code>State s a</code> como <code>s -&gt; (a,s)</code>; es decir, un elemento dentro de la mónada es una función dispuesta a tomar un estado inicial y a devolver algún elemento junto a un estado final.</p>
+<p>Existen tutoriales sobre la mónada estado en:</p>
+<ul>
+<li><a href="https://wiki.haskell.org/State_Monad">State Monad - Haskell wiki</a></li>
+<li><a href="http://learnyouahaskell.com/for-a-few-monads-more">For a few monads more - Learn you a Haskell</a></li>
+<li><a href="http://brandon.si/code/the-state-monad-a-tutorial-for-the-confused/">The State Monad: a tutorial for the confused - Brandon Simmons</a></li>
+<li><a href="http://adit.io/posts/2013-06-10-three-useful-monads.html">Three useful monads - Aditya Bhargava</a></li>
+</ul>
+<p>Un uso de la mónada estado puede ser el guardar la semilla de una generación pseudoaleatoria de números usando <a href="https://en.wikipedia.org/wiki/Linear_congruential_generator">generadores lineales congruenciales</a>. En concreto, usaremos la fórmula iterativa <span class="math inline">\(x_{i+1} \equiv 16807x_i \text{ mod } 2147483647\)</span>, que se expone <a href="https://math.dartmouth.edu/archive/m20f11/public_html/RANDOMNESS_LCG.pdf">aquí</a>. Con este generador podremos escribir dados de un número dado de caras y llamarlos varias veces. El estado interno pasará la semilla aleatoria de un dado al siguiente:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Control.Monad.State</span>
+<span class="kw">type</span> <span class="dt">Seed</span> <span class="fu">=</span> <span class="dt">Int</span>
+
+<span class="ot">dice ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">State</span> <span class="dt">Seed</span> <span class="dt">Int</span>
+dice n <span class="fu">=</span> state (\s <span class="ot">-&gt;</span> (s <span class="ot">`mod`</span> n <span class="fu">+</span> <span class="dv">1</span>, <span class="dv">16807</span><span class="fu">*</span>s <span class="ot">`mod`</span> <span class="dv">2147483647</span>))</code></pre></div>
+<p>Y podríamos llamarlo con la semilla <code>1000</code> de la forma siguiente; que nos devolverá por un lado el resultado de la tirada y por otro lado la nueva semilla:</p>
+<pre class="example"><code>λ&gt; runState (dice 6) 1000
+(5,1660)
+</code></pre>
+<p>Si queremos hacer varias tiradas seguidas, podemos usar <code>replicateM :: Int -&gt; m a -&gt; m [a]</code>, que se encarga de pasar internamente la semilla de cada tirada a la siguiente tirada:</p>
+<pre class="example"><code>λ&gt; fst (runState (replicateM 100 (dice 6)) 1037)
+
+[6,6,2,5,4,3,6,1,4,6,3,6,4,4,6,3,5,1,5,2,6,4,2,6,4,2,4,
+5,1,6,5,4,1,3,5,4,6,4,2,3,4,2,1,1,6,5,5,4,1,1,4,6,5,3,6,
+3,1,1,5,1,4,1,2,3,5,5,4,5,3,3,2,6,4,1,1,1,2,5,4,5,2,4,5,
+6,1,2,4,3,3,6,4,6,3,4,5,1,4,2,2,2]
+</code></pre>
+<p>Incluso podemos crear nuevos generadores aleatorios a partir de los anteriores con las operaciones usuales:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">twodices ::</span> <span class="dt">State</span> <span class="dt">Seed</span> <span class="dt">Int</span>
+twodices <span class="fu">=</span> <span class="kw">do</span>
+    a <span class="ot">&lt;-</span> dice <span class="dv">6</span>
+    b <span class="ot">&lt;-</span> dice <span class="dv">6</span>
+    return (a<span class="fu">+</span>b)</code></pre></div>
+<p>Cuando lo llamemos, tomará la distribución suma de las dos distribuciones de dados:</p>
+<pre class="example"><code>λ&gt; fst (runState (replicateM 100 twodices) 1032)
+
+[8,11,8,8,5,3,7,8,9,5,2,6,7,9,8,7,5,9,3,9,10,7,7,10,
+8,2,5,6,4,10,8,6,4,6,4,8,9,7,12,11,9,3,2,7,5,5,6,10,
+6,6,3,11,4,7,3,6,3,7,10,4,4,11,4,10,3,5,2,8,4,10,12,
+8,9,5,9,11,6,4,10,6,6,12,5,2,7,8,7,4,4,4,9,6,6,6,3,
+11,11,9,7,6]
+</code></pre>
+<h2 id="mónadas-en-teoría-de-categorías">Mónadas en teoría de categorías</h2>
+<p>Para entender cómo funcionan las <a href="https://es.wikipedia.org/wiki/M%C3%B3nada_(teor%C3%ADa_de_categor%C3%ADas)">mónadas</a> en teoría de categorías tenemos que entender dos conceptos: los <em>productos en una <a href="https://es.wikipedia.org/wiki/Categor%C3%ADa_monoidal">categoría monoidal</a></em> y <em>los endofuntores de una categoría</em>. La unión de ambos conceptos es lo que nos dará las mónadas como una construcción en teoría de categorías.</p>
+<h3 id="categorías-monoidales">Categorías monoidales</h3>
+<p>Simplificando, una categoría monoidal es aquella donde, dados dos objetos <span class="math inline">\(A,B\)</span>, tenemos un objeto /“producto tensor”/ de ambos, <span class="math inline">\(A \otimes B\)</span>, donde además existe un objeto identidad <span class="math inline">\(I\)</span> cumpliendo propiedades como:</p>
+<p><span class="math display">\[A \otimes B \cong B \otimes A\]</span></p>
+<p><span class="math display">\[A \otimes (B \otimes C) \cong (A \otimes B) \otimes C\]</span></p>
+<p><span class="math display">\[A \otimes I \cong A\]</span></p>
+<h3 id="ejemplos-de-categorías-monoidales">Ejemplos de categorías monoidales</h3>
+<p>Los <strong>conjuntos</strong> con el producto cartesiano y el conjunto de un elemento forman ya una categoría monoidal. Puede comprobarse sobre ellos que existen los isomorfismos:</p>
+<p><span class="math display">\[A \times B \cong B \times A\]</span></p>
+<p><span class="math display">\[A \times (B \times C) \cong (A \times B) \times C\]</span></p>
+<p><span class="math display">\[A \times \{\bullet\} \cong A\]</span></p>
+<p>Pero además, podemos darles <em>otra</em> estructura de categoría monoidal, esta vez con la <a href="https://es.wikipedia.org/wiki/Uni%C3%B3n_disjunta">unión disjunta</a> y el conjunto vacío:</p>
+<p><span class="math display">\[A \sqcup B \cong B \sqcup A\]</span></p>
+<p><span class="math display">\[A \sqcup (B \sqcup C) \cong (A \sqcup B) \sqcup C\]</span></p>
+<p><span class="math display">\[A \sqcup \varnothing \cong A\]</span></p>
+<p>En general, <strong>todas las categorías con productos finitos son categorías monoidales</strong> con el producto categórico y el objeto terminal como unidad. Todas las categorías con coproductos finitos son categorías monoidales con el coproducto categórico y el objeto inicial como unidad.</p>
+<p>Otro ejemplo distinto lo forman los <strong>espacios vectoriales</strong> sobre un cuerpo <span class="math inline">\(K\)</span> con el producto tensor y el propio cuerpo sirviendo como unidad; o los <strong>grupos abelianos</strong> con el producto tensor y <span class="math inline">\(\mathbb{Z}\)</span> siendo la unidad.</p>
+<h3 id="objetos-monoide">Objetos monoide</h3>
+<p>Un objeto <span class="math display">\[A\]</span> de una categoría monoidal es objeto monoide cuando puedo definir un morfismo desde el objeto identidad hacia él y un morfismo desde el producto tensor <span class="math display">\[A \otimes A\]</span> hacia él. Es decir, hay un morfismo <em>cero</em>:</p>
+<p><span class="math display">\[ I \overset{0}\longrightarrow A \]</span></p>
+<p>Y un morfismo <em>multiplicación</em>:</p>
+<p><span class="math display">\[ A \otimes A \overset{\mu}\longrightarrow A \]</span></p>
+<p>Cumpliendo ciertas propiedades similares a las que exigimos a un monoide. De hecho, un objeto monoide en la categoría de los conjuntos con el producto cartesiano es simplemente un <strong>monoide</strong> normal y corriente.</p>
+<h3 id="categorías-de-endofuntores">Categorías de endofuntores</h3>
+<p>El ejemplo que nos interesa ahora, sin embargo, es el de los <strong>endofuntores</strong> de una categoría. Un <strong>funtor</strong>, de forma simplificada, es una <em>aplicación entre categorías</em>; que lleva objetos en objetos y morfismos en morfismos, respetando además el punto de inicio y fin de cada morfismo.</p>
+<p>Si consideramos los funtores de una categoría a sí misma, tenemos los <strong>endofuntores</strong> de la categoría. Y entre ellos existen transformaciones naturales que actúan como morfismos en el sentido de que se componen para dar otras transformaciones naturales. Teniendo unos objetos (los endofuntores), y unos morfismos (las transformaciones naturales), tenemos una categoría. Nótese que hemos abstraído mucho, estamos trabajando con una categoría en la que cada objeto es en sí mismo un endofuntor y cada morfismo es toda una transformación natural entre dos funtores.</p>
+<p>Esta es además una categoría monoidal. El producto tensor de esta categoría monoidal será la composición <span class="math inline">\(\circ\)</span>, y el objeto identidad el endofuntor identidad, que actúa dejando fijo cada objeto y cada morfismo.</p>
+<h3 id="mónadas">Mónadas</h3>
+<p>Pues bien, una mónada es un objeto monoide en la categoría de los endofuntores con la composición como producto tensor. Esto quiere decir que es un endofuntor <span class="math display">\[F\]</span> con transformaciones naturales:</p>
+<p><span class="math display">\[F \circ F \Rightarrow F\]</span></p>
+<p><span class="math display">\[I \Rightarrow F\]</span></p>
+<p>Como una transformación natural nos da un morfismo por cada objeto en el que se aplica el funtor, lo que tenemos son familias de morfismos:</p>
+<p><span class="math display">\[F(F(X)) \overset{\mu_x}\longrightarrow F(X)\]</span></p>
+<p><span class="math display">\[X \overset{r_x}\longrightarrow F(X)\]</span></p>
+<h3 id="una-categoría-para-la-programación-funcional">Una categoría para la programación funcional</h3>
+<p>Algunos sistemas de tipos, con las funciones entre ellos <code>A -&gt; B</code> como morfismos, forman una categoría<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. No es el caso de Haskell, en el que, por varios motivos, sus tipos no forman una categoría<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>; pero las construcciones con inspiración en la teoría de categorías toman el nombre de sus homólogas.<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></p>
+<p>El primer ejemplo de esto son los <strong>funtores</strong>. En Haskell, un funtor se define como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span> 
+<span class="ot">  fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b </code></pre></div>
+<p>Es decir un funtor toma un tipo <code>a</code> (un objeto de la categoría), y nos devuelve otro tipo <code>f a</code> (otro objeto de la <em>misma</em> categoría). Por otro lado, el funtor toma un morfismo <code>a -&gt; b</code> y nos devuelve otro morfismo <code>f a -&gt; f b</code>. Es decir, los funtores de la programación funcional son <strong>endofuntores en la categoría de los tipos</strong>, siempre que conserven ciertas reglas que tienen su reflejo en las reglas de funtores en Haskell.</p>
+<h3 id="monoides-en-la-categoría-de-los-endofuntores">Monoides en la categoría de los endofuntores</h3>
+<p>Entonces, si los funtores <code>f :: * -&gt; *</code> son endofuntores en alguna categoría, tiene sentido cuestionarse cuáles de ellos son monoides. Esto, junto con ciertas restricciones que se le imponen como leyes a las mónadas, equivale a decir que existen los morfismos dados por las transformaciones naturales que pedíamos antes, es decir, deben existir morfismos de tipos <code>a -&gt; m a</code> y <code>m (m a) -&gt; m a</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">return<span class="ot"> ::</span> a <span class="ot">-&gt;</span> m a
+<span class="ot">join ::</span> m (m a) <span class="ot">-&gt;</span> m a</code></pre></div>
+<p>Así, a cualquier funtor que tiene estos dos morfismos, además del <code>fmap</code> que tenía por ser funtor, lo llamamos <strong>mónada</strong>. Nótese que <code>&gt;&gt;=</code> puede implementarse desde <code>join</code> y viceversa, como:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">(&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+(<span class="fu">&gt;&gt;=</span>) x f <span class="fu">=</span> join (fmap f a)
+
+<span class="ot">join ::</span> m (m a) <span class="ot">-&gt;</span> m a
+join x <span class="fu">=</span> x <span class="fu">&gt;&gt;=</span> id</code></pre></div>
+<p>Tenemos entonces dos definiciones equivalentes de lo que es una mónada. Una desde la teoría de categorías y otra desde la teoría de tipos y los lenguajes de programación funcional. Una visión desde las mónadas como monoides en la categoría de los endofuntores desde dentro de Haskell puede verse <a href="http://blog.sigfpe.com/2008/11/from-monoids-to-monads.html">aquí</a>.</p>
+<h2 id="y-más">Y más</h2>
+<p>Además de las enunciadas en este post, existen más otros temas relevantes en relación a las mónadas, tanto en programación funcional como en teoría de categorías:</p>
+<ul>
+<li><a href="http://book.realworldhaskell.org/read/monad-transformers.html">Transformadores de mónadas</a>, usadas para componer mónadas.</li>
+<li><a href="http://stackoverflow.com/questions/8428554/what-is-the-comonad-typeclass-in-haskell">Comónadas</a>, la noción dual de una mónada.</li>
+<li><a href="https://en.wikipedia.org/wiki/Kleisli_category">Categorías de Kleisli</a>, cada mónada da lugar a una categoría de Kleisli.</li>
+<li><a href="https://en.wikipedia.org/wiki/Adjoint_functors">Funtores adjuntos</a>, cada par de funtores adjuntos da lugar a una mónada.</li>
+<li><a href="http://www.cs.tufts.edu/comp/150FP/archive/brent-yorgey/tc.pdf">Typeclassopedia</a>, una revisión de otras clases de tipos relevantes en Haskell y relacionadas con la teoría de categorías.</li>
+</ul>
+<h2 id="referencias">Referencias</h2>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Peligros de la notación do. <a href="https://wiki.haskell.org/Do_notation_considered_harmful">Do notation considered harmful</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Enumerando los racionales. <a href="http://www.cs.ox.ac.uk/people/jeremy.gibbons/publications/rationals.pdf">Enumerating the rationals - J. Gibbons, D. Lester, R. Bird</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>La correspondencia entre tipos, lógica y categorías. <a href="https://ncatlab.org/nlab/show/computational+trinitarianism">Computational Trinitarianism - NLab</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Por qué los tipos de Haskell no son una categoría. <a href="http://math.andrej.com/2016/08/06/hask-is-not-a-category/">Hask is not a category - Andrej Bauer</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Por qué en ocasiones puede ser útil pensar en ellos como una categoría. <a href="https://ro-che.info/articles/2016-08-07-hask-category">Does it matter if Hask is (not) a category?</a><a href="#fnref5">↩</a></p></li>
+</ol>
+</div>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>;
+	    written with
+	    <a href="https://www.gnu.org/software/emacs/">Emacs</a> and
+	    <a href="http://orgmode.org/">org-mode</a>.
+        </div>
+    </body>
+</html>
