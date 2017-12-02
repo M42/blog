@@ -9,5 +9,9 @@ executable site
                   , hakyll == 4.9.*
                   , pandoc
                   , containers
+                  , temporary
+                  , process
+                  , bytestring
+                  , deepseq
   ghc-options:      -threaded
   default-language: Haskell2010

@@ -4,8 +4,7 @@ import           Data.Monoid (mappend)
 import           Text.Pandoc.Options
 import qualified Data.Set as S
 import           Hakyll
-import           Hakyll.Core.Configuration
-
+import qualified Data.ByteString.Lazy    as LB
 
 --------------------------------------------------------------------------------
 conf :: Configuration
@@ -45,6 +44,10 @@ main = hakyllWith conf $ do
             >>= loadAndApplyTemplate "templates/default.html" postCtx
             >>= relativizeUrls
 
+    match "talks/*" $ do
+        route $ setExtension "pdf"
+        compile $ getResourceLBS >>= withItemBody (unixFilterLBS "org2beamer" ["-d"])
+
     create ["index.html"] $ do
         route idRoute
         compile $ do
@@ -58,6 +61,20 @@ main = hakyllWith conf $ do
                 >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
                 >>= loadAndApplyTemplate "templates/default.html" archiveCtx
                 >>= relativizeUrls
+
+    create ["talks.html"] $ do
+        route idRoute
+        compile $ do
+            talks <- talkLoader (loadAll "talks/*")
+            let archiveCtx =
+                    listField "posts" postCtx (return talks) `mappend`
+                    constField "title" "Talks"            `mappend`
+                    defaultContext
+
+            makeItem ""
+                >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
+                >>= loadAndApplyTemplate "templates/default.html" archiveCtx
+                >>= relativizeUrls  
 
     match "templates/*" $ compile templateBodyCompiler
 
@@ -73,11 +90,10 @@ main = hakyllWith conf $ do
 
 --------------------------------------------------------------------------------
 postCtx :: Context String
-postCtx =
-    dateField "date" "%B %e, %Y" `mappend`
-    defaultContext
+postCtx = dateField "date" "%B %e, %Y" `mappend` defaultContext
 
 --------------------------------------------------------------------------------
+-- Compilers
 -- Mathjax.
 -- http://travis.athougies.net/posts/2013-08-13-using-math-on-your-hakyll-blog.html
 pandocMathCompiler =
@@ -90,3 +106,7 @@ pandocMathCompiler =
                           writerHTMLMathMethod = MathJax ""
                         }
     in pandocCompilerWith defaultHakyllReaderOptions writerOptions
+
+
+talkLoader :: Compiler [Item LB.ByteString] -> Compiler [Item String]
+talkLoader = fmap (fmap (fmap ((fmap toEnum) . (fmap fromEnum) . LB.unpack)))
