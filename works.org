@@ -2,9 +2,16 @@
 title: Works
 -----
 
+** Notes
+
+ * [[https://m42.github.io/mikrokosmos/][Mikrokosmos]] - /A tutorial on lambda calculus/
+ * [[https://github.com/M42/introCategorias][Introducción a categorías]] - /Apuntes introductorios con las definiciones básicas/
+ * [[https://m42.github.io/math/conmutativa.html][Álgebra conmutativa y computacional]] - /Notas de clase/
+ * [[https://m42.github.io/math/funcional.html][Análisis funcional]] - /Notas de clase/
+ * [[https://m42.github.io/math/algebraiii.html][Álgebra III]] - /Notas de clase/
+
 ** Slides
 
  * [[https://m42.github.io/talks/categorias.pdf][Categorías y funtores]] - /Seminario sobre categorías. Noviembre de 2017/
  * [[https://m42.github.io/talks/untypedlambda.pdf][Cálculo lambda no tipado]] - /Notas de introducción al cálculo lambda. Octubre de 2017/
  * [[https://m42.github.io/talks/emacs.html][Introducción a Emacs]] - /Seminarios de LibreIM. Octubre de 2016/
-
