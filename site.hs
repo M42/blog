@@ -5,6 +5,8 @@ import           Text.Pandoc.Options
 import qualified Data.Set as S
 import           Hakyll
 import qualified Data.ByteString.Lazy    as LB
+import           Text.Regex
+import           Debug.Trace
 
 --------------------------------------------------------------------------------
 conf :: Configuration
@@ -30,7 +32,7 @@ main = hakyllWith conf $ do
         route   idRoute
         compile compressCssCompiler
 
-    match (fromList ["about.org"]) $ do
+    match (fromList ["about.org","works.org"]) $ do
         route   $ setExtension "html"
         compile $ pandocMathCompiler
             >>= loadAndApplyTemplate "templates/default.html" defaultContext
@@ -44,9 +46,9 @@ main = hakyllWith conf $ do
             >>= loadAndApplyTemplate "templates/default.html" postCtx
             >>= relativizeUrls
 
-    match "talks/*" $ do
-        route $ setExtension "pdf"
-        compile $ getResourceLBS >>= withItemBody (unixFilterLBS "org2beamer" ["-d"])
+    -- match "talks/*.org" $ do
+    --     route $ setExtension "pdf"
+    --     compile $ getResourceLBS >>= withItemBody (unixFilterLBS "org2beamer" ["-d"])
 
     create ["index.html"] $ do
         route idRoute
@@ -62,19 +64,19 @@ main = hakyllWith conf $ do
                 >>= loadAndApplyTemplate "templates/default.html" archiveCtx
                 >>= relativizeUrls
 
-    create ["talks.html"] $ do
-        route idRoute
-        compile $ do
-            talks <- talkLoader (loadAll "talks/*")
-            let archiveCtx =
-                    listField "posts" postCtx (return talks) `mappend`
-                    constField "title" "Talks"            `mappend`
-                    defaultContext
+    -- create ["talks.html"] $ do
+    --     route idRoute
+    --     compile $ do
+    --         talks <- recentFirst =<< byteLoader (loadAll "talks/*.org")
+    --         let archiveCtx =
+    --                 listField "posts" postCtx (return talks) `mappend`
+    --                 constField "title" "Talks"            `mappend`
+    --                 defaultContext
 
-            makeItem ""
-                >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
-                >>= loadAndApplyTemplate "templates/default.html" archiveCtx
-                >>= relativizeUrls  
+    --         makeItem ""
+    --             >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
+    --             >>= loadAndApplyTemplate "templates/default.html" archiveCtx
+    --             >>= relativizeUrls  
 
     match "templates/*" $ compile templateBodyCompiler
 
@@ -108,5 +110,5 @@ pandocMathCompiler =
     in pandocCompilerWith defaultHakyllReaderOptions writerOptions
 
 
-talkLoader :: Compiler [Item LB.ByteString] -> Compiler [Item String]
-talkLoader = fmap (fmap (fmap ((fmap toEnum) . (fmap fromEnum) . LB.unpack)))
+-- byteLoader :: Compiler [Item LB.ByteString] -> Compiler [Item String]
+-- byteLoader = fmap (fmap (fmap ((fmap toEnum) . (fmap fromEnum) . LB.unpack)))

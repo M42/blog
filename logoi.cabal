@@ -9,9 +9,7 @@ executable site
                   , hakyll == 4.9.*
                   , pandoc
                   , containers
-                  , temporary
-                  , process
                   , bytestring
-                  , deepseq
+                  , regex-compat
   ghc-options:      -threaded
   default-language: Haskell2010
