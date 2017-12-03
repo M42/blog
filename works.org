@@ -9,6 +9,9 @@ title: Works
  * [[https://m42.github.io/math/conmutativa.html][Álgebra conmutativa y computacional]] - /Notas de clase/
  * [[https://m42.github.io/math/funcional.html][Análisis funcional]] - /Notas de clase/
  * [[https://m42.github.io/math/algebraiii.html][Álgebra III]] - /Notas de clase/
+ * [[https://m42.github.io/math/representaciones.html][Grupos y representaciones]] - /Notas de clase/
+ * [[https://m42.github.io/math/topologiaii.html][Topología II]] - /Notas de clase/
+ * [[https://m42.github.io/math/inferencia.html][Inferencia estadística]] - /Notas de clase/
 
 ** Slides
 
